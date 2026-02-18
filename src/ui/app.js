@@ -141,6 +141,7 @@ const App = {
           const data = prepararDatosExportacion({ tipo: this.state.vista, area: this.state.area, grupo: this.state.grupo, grado: this.state.grado, periodo: this.state.periodo });
           if (data) exportarJSON(data);
           break;
+        case 'export-institucional': exportarPlanInstitucional(this.state.grado, this.state.periodo); break;
         case 'open-config': this.navigate('#/config'); break;
         case 'ia-action': this.handleIAAction(val); break;
         case 'ia-gemini': this.handleIAGemini(val); break;
@@ -793,6 +794,7 @@ const App = {
         <div class="flex gap-2">
           <button class="btn btn-secondary btn-sm" data-action="export-pdf">PDF</button>
           <button class="btn btn-secondary btn-sm" data-action="export-json">JSON</button>
+          <button class="btn btn-primary btn-sm" data-action="export-institucional">Formato Institucional</button>
         </div>
       </div>
 
