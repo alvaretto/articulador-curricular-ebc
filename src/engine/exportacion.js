@@ -83,7 +83,7 @@ function prepararDatosExportacion(vista) {
       };
     case 'estandares':
       return {
-        titulo: `EBC - ${AREAS_EBC[vista.area]?.nombre} - Grupo ${vista.grupo}`,
+        titulo: `Estándares - ${AREAS_EBC[vista.area]?.nombre} - Grupo ${vista.grupo}`,
         area: vista.area,
         grupo: vista.grupo,
         estandarGeneral: getEstandarGeneral(vista.area, vista.grupo),

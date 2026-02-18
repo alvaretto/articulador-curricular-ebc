@@ -80,6 +80,7 @@ function buscarDBA(query, filtroArea) {
 function buscarTodo(query, filtroArea) {
   const estandares = buscarEstandares(query, filtroArea);
   const dbas = buscarDBA(query, filtroArea);
+  const icfes = typeof buscarICFES === 'function' ? buscarICFES(query, filtroArea) : [];
 
-  return [...estandares, ...dbas].sort((a, b) => b.relevancia - a.relevancia);
+  return [...estandares, ...dbas, ...icfes].sort((a, b) => b.relevancia - a.relevancia);
 }

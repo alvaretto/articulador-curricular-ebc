@@ -75,6 +75,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s9-01', 'mat-s9-02'],
+        evidenciasICFES: ['mat-s9-01-e1', 'mat-s9-01-e2', 'mat-s9-02-e1'],
+        nivelEsperado: 'Mínimo',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 8° (editorial Norma o Santillana)',
           'Recta numérica en cartulina',
@@ -170,6 +174,10 @@ const PLANES_MATEMATICAS = {
             'Determina el valor de la incógnita en una ecuación lineal.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s9-02', 'mat-s9-03', 'mat-s9-08'],
+        evidenciasICFES: ['mat-s9-02-e1', 'mat-s9-02-e2', 'mat-s9-03-e1', 'mat-s9-08-e1'],
+        nivelEsperado: 'Mínimo',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 8°',
@@ -267,6 +275,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s9-05', 'mat-s9-06', 'mat-s9-08'],
+        evidenciasICFES: ['mat-s9-05-e1', 'mat-s9-05-e2', 'mat-s9-06-e1', 'mat-s9-08-e1', 'mat-s9-08-e2'],
+        nivelEsperado: 'Satisfactorio',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 8°',
           'Regla, compás, transportador y escuadras',
@@ -362,6 +374,10 @@ const PLANES_MATEMATICAS = {
             'Calcula la probabilidad de un evento usando la razón favorable/total.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s9-06', 'mat-s9-09', 'mat-s9-10'],
+        evidenciasICFES: ['mat-s9-06-e2', 'mat-s9-06-e3', 'mat-s9-09-e1', 'mat-s9-09-e2', 'mat-s9-10-e1'],
+        nivelEsperado: 'Satisfactorio',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 8°',
@@ -472,6 +488,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s9-01', 'mat-s9-04'],
+        evidenciasICFES: ['mat-s9-01-e2', 'mat-s9-01-e3', 'mat-s9-04-e1', 'mat-s9-04-e2'],
+        nivelEsperado: 'Mínimo',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 9°',
           'GeoGebra para explorar la función cuadrática de forma dinámica',
@@ -566,6 +586,10 @@ const PLANES_MATEMATICAS = {
             'Identifica el tipo de sistema según su representación gráfica o algebraica.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s9-03', 'mat-s9-07', 'mat-s9-08'],
+        evidenciasICFES: ['mat-s9-03-e2', 'mat-s9-03-e3', 'mat-s9-07-e1', 'mat-s9-07-e2', 'mat-s9-08-e3'],
+        nivelEsperado: 'Satisfactorio',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 9°',
@@ -663,6 +687,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s9-04', 'mat-s9-08', 'mat-s9-10'],
+        evidenciasICFES: ['mat-s9-04-e1', 'mat-s9-04-e2', 'mat-s9-08-e2', 'mat-s9-08-e3', 'mat-s9-10-e1', 'mat-s9-10-e2'],
+        nivelEsperado: 'Satisfactorio',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 9°',
           'GeoGebra para explorar funciones lineales, exponenciales y logarítmicas',
@@ -758,6 +786,10 @@ const PLANES_MATEMATICAS = {
             'Determina la probabilidad condicional de un evento dado otro evento relacionado.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s9-06', 'mat-s9-09', 'mat-s9-10'],
+        evidenciasICFES: ['mat-s9-06-e2', 'mat-s9-06-e3', 'mat-s9-09-e1', 'mat-s9-09-e2', 'mat-s9-10-e2'],
+        nivelEsperado: 'Avanzado',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 9°',
@@ -868,6 +900,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s11-06', 'mat-s11-08'],
+        evidenciasICFES: ['mat-s11-06-e1', 'mat-s11-06-e2', 'mat-s11-08-e1', 'mat-s11-08-e2'],
+        nivelEsperado: 'Mínimo',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 10°',
           'Transportador, regla y calculadora científica con funciones trigonométricas',
@@ -963,6 +999,10 @@ const PLANES_MATEMATICAS = {
             'Identifica la identidad trigonométrica equivalente a una expresión dada.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s11-01', 'mat-s11-06'],
+        evidenciasICFES: ['mat-s11-01-e1', 'mat-s11-01-e2', 'mat-s11-06-e3'],
+        nivelEsperado: 'Satisfactorio',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 10°',
@@ -1060,6 +1100,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s11-05', 'mat-s11-07'],
+        evidenciasICFES: ['mat-s11-05-e1', 'mat-s11-05-e2', 'mat-s11-05-e3', 'mat-s11-07-e1'],
+        nivelEsperado: 'Satisfactorio',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 10°',
           'GeoGebra para construcción dinámica de cónicas',
@@ -1155,6 +1199,10 @@ const PLANES_MATEMATICAS = {
             'Calcula el número de combinaciones o permutaciones en una situación dada.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s11-09', 'mat-s11-10'],
+        evidenciasICFES: ['mat-s11-09-e1', 'mat-s11-09-e3', 'mat-s11-10-e1', 'mat-s11-10-e2'],
+        nivelEsperado: 'Avanzado',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 10°',
@@ -1265,6 +1313,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s11-01', 'mat-s11-02', 'mat-s11-11'],
+        evidenciasICFES: ['mat-s11-01-e1', 'mat-s11-02-e1', 'mat-s11-02-e2', 'mat-s11-11-e1'],
+        nivelEsperado: 'Mínimo',
+
         materialesEducativos: [
           'Texto de Cálculo (Stewart, Purcell o Larson, adaptado para media)',
           'GeoGebra para visualizar límites y continuidad gráficamente',
@@ -1360,6 +1412,10 @@ const PLANES_MATEMATICAS = {
             'Identifica los intervalos donde una función es creciente o decreciente usando la derivada.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s11-02', 'mat-s11-11', 'mat-s11-12'],
+        evidenciasICFES: ['mat-s11-02-e2', 'mat-s11-11-e2', 'mat-s11-11-e3', 'mat-s11-12-e1'],
+        nivelEsperado: 'Satisfactorio',
 
         materialesEducativos: [
           'Texto de Cálculo (Stewart o Purcell, adaptado para media)',
@@ -1457,6 +1513,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s11-04', 'mat-s11-11', 'mat-s11-12'],
+        evidenciasICFES: ['mat-s11-04-e1', 'mat-s11-11-e2', 'mat-s11-11-e3', 'mat-s11-12-e2'],
+        nivelEsperado: 'Satisfactorio',
+
         materialesEducativos: [
           'Texto de Cálculo (Stewart o Purcell, adaptado para media)',
           'GeoGebra para visualizar sumas de Riemann y convergencia a la integral',
@@ -1552,6 +1612,10 @@ const PLANES_MATEMATICAS = {
             'Justifica y comunica el procedimiento de solución de manera clara y precisa.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s11-03', 'mat-s11-04', 'mat-s11-09', 'mat-s11-12'],
+        evidenciasICFES: ['mat-s11-03-e1', 'mat-s11-04-e2', 'mat-s11-09-e2', 'mat-s11-09-e3', 'mat-s11-12-e2'],
+        nivelEsperado: 'Avanzado',
 
         materialesEducativos: [
           'Cuadernillo de simulacros ICFES (pruebas anteriores Saber 11)',

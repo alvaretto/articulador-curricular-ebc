@@ -1,4 +1,4 @@
-// app.js — Articulador Curricular EBC - Main Application
+// app.js — Articulador Curricular Saber ICFES - Main Application
 // Router hash + rendering + event handlers
 
 const EJE_SHORT_LABELS = {
@@ -204,13 +204,18 @@ const App = {
       return;
     }
 
-    results.innerHTML = items.slice(0, 8).map(item => `
-      <div class="search-result-item" data-action="navigate" data-value="#/area/${item.area}/${item.grupo || gradoAGrupoEBC(item.grado)}">
-        <span class="search-result-type">${item.tipo.toUpperCase()} · ${AREAS_EBC[item.area]?.nombre || item.area}</span>
-        <div class="search-result-text">${highlightText(item.texto, query)}</div>
-        <span class="badge badge-muted">${item.grupo || 'Grado ' + item.grado}</span>
-      </div>
-    `).join('');
+    const pruebaAGrupo = { 'saber-3': '1-3', 'saber-5': '4-5', 'saber-9': '8-9', 'saber-11': '10-11' };
+    results.innerHTML = items.slice(0, 8).map(item => {
+      const grupoNav = item.grupo || (item.prueba ? pruebaAGrupo[item.prueba] : null) || gradoAGrupoEBC(item.grado || '8');
+      const grupoLabel = item.grupo || (item.prueba ? pruebaAGrupo[item.prueba] : null) || ('Grado ' + item.grado);
+      return `
+        <div class="search-result-item" data-action="navigate" data-value="#/area/${item.area}/${grupoNav}">
+          <span class="search-result-type">${item.tipo.toUpperCase()} · ${AREAS_EBC[item.area]?.nombre || item.area}</span>
+          <div class="search-result-text">${highlightText(item.texto, query)}</div>
+          <span class="badge badge-muted">${grupoLabel}</span>
+        </div>
+      `;
+    }).join('');
     results.style.display = 'block';
   },
 
@@ -307,14 +312,14 @@ const App = {
     const inst = Storage.getInstitucion();
     return `
       <div class="print-header">
-        <div class="print-header-title">Articulador Curricular EBC</div>
+        <div class="print-header-title">Articulador Curricular Saber ICFES</div>
         <div class="print-header-subtitle">${inst.nombre || 'MEN Colombia'} · ${new Date().getFullYear()}</div>
       </div>
 
-      <h1 class="section-title">Diseño Curricular con EBC</h1>
+      <h1 class="section-title">Diseño Curricular Saber ICFES</h1>
       <p class="section-description">
-        Navegue los Estándares Básicos de Competencias del MEN, analice la progresión vertical entre grados
-        y genere articulaciones curriculares personalizadas. Seleccione un área para comenzar.
+        Navegue los Estándares Básicos de Competencias, DBA y aprendizajes ICFES alineados a las pruebas Saber.
+        Analice la progresión vertical entre grados y genere articulaciones curriculares. Seleccione un área para comenzar.
       </p>
 
       <div class="areas-grid">
@@ -411,8 +416,8 @@ const App = {
 
     return `
       <div class="print-header">
-        <div class="print-header-title">${info?.nombre || area} — EBC Grupo ${grupo}</div>
-        <div class="print-header-subtitle">Articulador Curricular EBC · MEN Colombia</div>
+        <div class="print-header-title">${info?.nombre || area} — Grupo ${grupo}</div>
+        <div class="print-header-subtitle">Articulador Curricular Saber ICFES · MEN Colombia</div>
       </div>
 
       <div class="flex items-center justify-between" style="flex-wrap:wrap; gap:var(--sp-3)">
@@ -460,6 +465,9 @@ const App = {
 
       <!-- DBA del grupo -->
       ${this.renderDBAGrupo(area, grupo)}
+
+      <!-- ICFES: Aprendizajes, Evidencias y Niveles -->
+      ${this.renderICFESSection(area, grupo, eje)}
 
       <!-- Panel IA -->
       ${this.renderIAPanel()}
@@ -582,6 +590,123 @@ const App = {
     `;
   },
 
+  // === ICFES SECTION ===
+  renderICFESSection(area, grupo, ejeFiltro) {
+    if (typeof articularEBCconICFES !== 'function') return '';
+    const articulacion = articularEBCconICFES(area, grupo);
+    if (!articulacion) return '';
+
+    const { pruebaICFES, aprendizajes, competencias, componentes } = articulacion;
+    const niveles = getNivelesDesempeno(area, pruebaICFES.id);
+
+    // Mapeo eje EBC → componente ICFES (Matemáticas)
+    // Mapeo eje EBC → componente ICFES por área
+    const EJE_A_COMPONENTE = {
+      // Matemáticas
+      'numerico': 'numerico-variacional',
+      'variacional': 'numerico-variacional',
+      'espacial': 'geometrico-metrico',
+      'metrico': 'geometrico-metrico',
+      'aleatorio': 'aleatorio',
+      // Lenguaje
+      'comprension': 'semantico',
+      'literatura': 'semantico',
+      'produccion': 'sintactico',
+      'medios': 'pragmatico',
+      'etica': 'pragmatico'
+    };
+    const componenteFiltro = ejeFiltro ? EJE_A_COMPONENTE[ejeFiltro] : null;
+    const componentesFiltrados = componenteFiltro
+      ? componentes.filter(c => c.id === componenteFiltro)
+      : componentes;
+
+    // Agrupar aprendizajes por componente
+    const porComponente = {};
+    for (const comp of componentesFiltrados) {
+      porComponente[comp.id] = aprendizajes.filter(a => a.componente === comp.id);
+    }
+
+    const totalAprendizajes = Object.values(porComponente).reduce((s, a) => s + a.length, 0);
+    const filtroLabel = componenteFiltro
+      ? componentesFiltrados[0]?.nombre || ''
+      : 'todos los componentes';
+
+    return `
+      <h2 class="section-title mt-4">ICFES — ${pruebaICFES.nombre}</h2>
+      <p class="section-description">
+        ${componenteFiltro
+          ? `Aprendizajes del componente <strong>${filtroLabel}</strong> (filtrado por eje seleccionado). <a href="#/area/${area}/${grupo}" class="text-accent" style="text-decoration:underline">Ver todos</a>`
+          : 'Aprendizajes evaluados, evidencias y niveles de desempeño según el marco de referencia ICFES para este grupo de grados.'}
+      </p>
+
+      <!-- Competencias y componentes -->
+      <div class="flex gap-2 mb-4" style="flex-wrap:wrap">
+        ${competencias.map(c => `<span class="badge badge-accent">${c.nombre}</span>`).join('')}
+        <span class="text-muted">·</span>
+        ${componentes.map(c => `<span class="badge ${componenteFiltro && c.id === componenteFiltro ? 'badge-accent' : 'badge-muted'}">${c.nombre}</span>`).join('')}
+      </div>
+
+      <!-- Aprendizajes por componente -->
+      ${componentesFiltrados.map(comp => {
+        const aprends = porComponente[comp.id] || [];
+        if (!aprends.length) return '';
+        return `
+          <div class="card card-accent mt-3">
+            <div class="card-header">
+              <span class="card-title">${comp.nombre}</span>
+              <span class="badge badge-muted">${aprends.length} aprendizajes</span>
+            </div>
+            <div class="card-body">
+              ${aprends.map(a => `
+                <details class="icfes-aprendizaje">
+                  <summary class="estandar-item" style="cursor:pointer; list-style:none">
+                    <div class="flex items-center gap-2" style="flex-wrap:wrap">
+                      <span class="badge badge-accent" style="font-size:0.65rem">${a.competencia}</span>
+                      <span>${a.enunciado}</span>
+                    </div>
+                  </summary>
+                  <div class="icfes-evidencias">
+                    ${a.evidencias.map(e => `
+                      <div class="icfes-evidencia-item">
+                        <span class="text-muted text-xs">${e.id}</span> ${e.enunciado}
+                      </div>
+                    `).join('')}
+                  </div>
+                </details>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('')}
+
+      <!-- Niveles de desempeño -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <span class="card-title">Niveles de Desempeño — ${pruebaICFES.nombre}</span>
+        </div>
+        <div class="card-body">
+          <div class="icfes-niveles-grid">
+            ${niveles.map(nivel => `
+              <div class="icfes-nivel" style="border-left: 4px solid ${nivel.color}">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="icfes-nivel-dot" style="background:${nivel.color}"></span>
+                  <strong>${nivel.nombre}</strong>
+                  <span class="text-muted text-xs">(${nivel.rango[0]}–${nivel.rango[1]})</span>
+                </div>
+                <p class="text-sm text-secondary" style="line-height:var(--leading-loose)">${nivel.descripcion}</p>
+                ${nivel.aprendizajesEsperados.length > 0 ? `
+                  <div class="flex gap-1 mt-2" style="flex-wrap:wrap">
+                    ${nivel.aprendizajesEsperados.map(id => `<span class="badge badge-muted" style="font-size:0.6rem">${id}</span>`).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
   // === VIEW: PLAN DE PERIODO ===
   renderPlan() {
     const grado = this.state.grado || '8';
@@ -603,7 +728,7 @@ const App = {
     return `
       <div class="print-header">
         <div class="print-header-title">Plan de Periodo — Matemáticas ${grado}° · Periodo ${periodo}</div>
-        <div class="print-header-subtitle">${Storage.getInstitucion().nombre || 'Articulador Curricular EBC'}</div>
+        <div class="print-header-subtitle">${Storage.getInstitucion().nombre || 'Articulador Curricular Saber ICFES'}</div>
       </div>
 
       <div class="flex items-center justify-between" style="flex-wrap:wrap; gap:var(--sp-3)">
@@ -767,6 +892,12 @@ const App = {
         </div>
       </div>
 
+      <!-- Articulación ICFES: Aprendizajes resueltos + Nivel de Desempeño -->
+      ${this.renderPlanICFES(grado, plan)}
+
+      <!-- Progresión Vertical compacta -->
+      ${this.renderPlanProgresion(grado, plan)}
+
       <!-- Panel IA -->
       ${this.renderIAPanel()}
 
@@ -774,6 +905,146 @@ const App = {
       <div class="flex justify-between mt-4">
         ${parseInt(grado) > 8 ? `<button class="btn btn-ghost" data-action="navigate" data-value="#/plan/${parseInt(grado)-1}/${periodo}">← Grado ${parseInt(grado)-1}°</button>` : '<span></span>'}
         ${parseInt(grado) < 11 ? `<button class="btn btn-ghost" data-action="navigate" data-value="#/plan/${parseInt(grado)+1}/${periodo}">Grado ${parseInt(grado)+1}° →</button>` : '<span></span>'}
+      </div>
+    `;
+  },
+
+  // === PLAN: ICFES Aprendizajes resueltos + Nivel de Desempeño ===
+  renderPlanICFES(grado, plan) {
+    if (typeof getAprendizajesICFES !== 'function') return '';
+    if (!plan.aprendizajesICFES || !plan.aprendizajesICFES.length) return '';
+
+    const pruebaId = getPruebaParaGrado(grado);
+    if (!pruebaId) return '';
+
+    const todosAprendizajes = getAprendizajesICFES('matematicas', pruebaId);
+    const aprendizajesResueltos = plan.aprendizajesICFES
+      .map(id => todosAprendizajes.find(a => a.id === id))
+      .filter(Boolean);
+
+    if (!aprendizajesResueltos.length) return '';
+
+    // Nivel de desempeño
+    const niveles = getNivelesDesempeno('matematicas', pruebaId);
+    const nivelActivo = niveles.find(n => n.nombre === plan.nivelEsperado);
+
+    return `
+      <h2 class="section-title mt-4">Articulación ICFES — ${plan.nivelEsperado || ''}</h2>
+      <p class="section-description">Aprendizajes y evidencias ICFES vinculados a este periodo. Nivel de desempeño esperado al finalizar.</p>
+
+      <!-- Aprendizajes resueltos -->
+      <div class="card card-accent mt-3">
+        <div class="card-header">
+          <span class="card-title">Aprendizajes del Periodo</span>
+          <span class="badge badge-muted">${aprendizajesResueltos.length} aprendizajes</span>
+        </div>
+        <div class="card-body">
+          ${aprendizajesResueltos.map(a => `
+            <details class="icfes-aprendizaje">
+              <summary class="estandar-item" style="cursor:pointer; list-style:none">
+                <div class="flex items-center gap-2" style="flex-wrap:wrap">
+                  <span class="badge badge-accent" style="font-size:0.65rem">${a.competencia}</span>
+                  <span class="badge badge-muted" style="font-size:0.6rem">${a.componente}</span>
+                  <span>${a.enunciado}</span>
+                </div>
+              </summary>
+              <div class="icfes-evidencias">
+                ${(plan.evidenciasICFES || []).length > 0
+                  ? a.evidencias.filter(e => plan.evidenciasICFES.includes(e.id)).map(e => `
+                      <div class="icfes-evidencia-item">
+                        <span class="text-muted text-xs">${e.id}</span> ${e.enunciado}
+                      </div>
+                    `).join('') || a.evidencias.map(e => `
+                      <div class="icfes-evidencia-item">
+                        <span class="text-muted text-xs">${e.id}</span> ${e.enunciado}
+                      </div>
+                    `).join('')
+                  : a.evidencias.map(e => `
+                      <div class="icfes-evidencia-item">
+                        <span class="text-muted text-xs">${e.id}</span> ${e.enunciado}
+                      </div>
+                    `).join('')
+                }
+              </div>
+            </details>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Niveles de desempeño con activo destacado -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <span class="card-title">Nivel de Desempeño Esperado</span>
+          <span class="badge" style="background:${nivelActivo?.color || 'var(--muted)'}; color:white; font-size:0.7rem">${plan.nivelEsperado}</span>
+        </div>
+        <div class="card-body">
+          <div class="icfes-niveles-grid">
+            ${niveles.map(nivel => `
+              <div class="icfes-nivel ${nivel.nombre === plan.nivelEsperado ? 'icfes-nivel-activo' : 'icfes-nivel-inactivo'}" style="border-left: 4px solid ${nivel.color}">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="icfes-nivel-dot" style="background:${nivel.color}"></span>
+                  <strong>${nivel.nombre}</strong>
+                  <span class="text-muted text-xs">(${nivel.rango[0]}–${nivel.rango[1]})</span>
+                </div>
+                ${nivel.nombre === plan.nivelEsperado
+                  ? `<p class="text-sm text-secondary" style="line-height:var(--leading-loose)">${nivel.descripcion}</p>`
+                  : ''
+                }
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // === PLAN: Progresión Vertical compacta ===
+  renderPlanProgresion(grado, plan) {
+    if (typeof getLineaProgresion !== 'function') return '';
+    if (!plan.tiposPensamiento || !plan.tiposPensamiento.length) return '';
+
+    const TIPO_A_EJE = {
+      'Numérico': 'numerico', 'Espacial': 'espacial', 'Métrico': 'metrico',
+      'Aleatorio': 'aleatorio', 'Variacional': 'variacional'
+    };
+    const GRADO_A_GRUPO = { '8': '8-9', '9': '8-9', '10': '10-11', '11': '10-11' };
+
+    const ejeId = TIPO_A_EJE[plan.tiposPensamiento[0]];
+    if (!ejeId) return '';
+
+    const grupoActual = GRADO_A_GRUPO[String(grado)];
+    const linea = getLineaProgresion('matematicas', ejeId);
+    if (!linea.length) return '';
+
+    // Filtrar: grupo anterior, actual, siguiente
+    const idxActual = linea.findIndex(l => l.grupo === grupoActual);
+    if (idxActual < 0) return '';
+
+    const contexto = linea.slice(Math.max(0, idxActual - 1), idxActual + 2);
+
+    return `
+      <h2 class="section-title mt-4">Progresión Vertical — ${plan.tiposPensamiento[0]}</h2>
+      <p class="section-description">Cómo evoluciona este eje desde el grupo anterior hacia el siguiente.</p>
+
+      <div class="flex gap-3 mt-3" style="flex-wrap:wrap">
+        ${contexto.map(item => `
+          <div class="card ${item.grupo === grupoActual ? 'card-accent' : ''}" style="flex:1; min-width:200px">
+            <div class="card-header">
+              <span class="card-title">Grados ${item.grupo}</span>
+              ${item.grupo === grupoActual ? '<span class="badge badge-accent">Actual</span>' : ''}
+            </div>
+            <div class="card-body">
+              ${item.estandares.length > 0
+                ? item.estandares.map(e => `<p class="text-sm text-secondary mb-2" style="line-height:var(--leading-loose)">· ${e}</p>`).join('')
+                : '<p class="text-muted text-sm">Sin datos</p>'
+              }
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="flex justify-center mt-3">
+        <a href="#/area/matematicas/${grupoActual}/${ejeId}" class="btn btn-secondary btn-sm">Ver progresión completa K-11 →</a>
       </div>
     `;
   },
@@ -828,7 +1099,7 @@ const App = {
             <button class="btn btn-primary" onclick="Storage.setApiKey(document.getElementById('cfg-apikey').value); App.showToast('API key guardada')">
               Guardar API Key
             </button>
-            <button class="btn btn-secondary" onclick="IA.verificarApiKey(document.getElementById('cfg-apikey').value).then(ok => App.showToast(ok ? 'API key válida' : 'API key inválida'))">
+            <button class="btn btn-secondary" onclick="IA.verificarApiKey(document.getElementById('cfg-apikey').value).then(r => App.showToast(r.ok ? r.mensaje : 'Error: ' + r.mensaje))">
               Verificar
             </button>
           </div>
@@ -854,7 +1125,7 @@ const App = {
 
     return `
       <h1 class="section-title">Búsqueda</h1>
-      <p class="section-description">Busque estándares EBC, DBA y contenidos en todas las áreas.</p>
+      <p class="section-description">Busque estándares EBC, DBA, aprendizajes ICFES y contenidos en todas las áreas.</p>
 
       <div class="search-container">
         <span class="search-icon">🔍</span>
@@ -863,18 +1134,25 @@ const App = {
 
       ${resultados.length > 0 ? `
         <p class="text-sm text-muted mt-4">${resultados.length} resultado${resultados.length > 1 ? 's' : ''}</p>
-        ${resultados.slice(0, 20).map(r => `
-          <div class="card card-accent mt-2" data-action="navigate" data-value="#/area/${r.area}/${r.grupo || gradoAGrupoEBC(r.grado)}" style="cursor:pointer">
-            <div class="card-body">
-              <div class="flex gap-2 mb-2">
-                <span class="badge badge-${r.area === 'matematicas' ? 'mat' : r.area === 'lenguaje' ? 'len' : r.area === 'ciencias-naturales' ? 'nat' : 'soc'}">${AREAS_EBC[r.area]?.nombre || r.area}</span>
-                <span class="badge badge-muted">${r.tipo.toUpperCase()}</span>
-                <span class="badge badge-muted">${r.grupo || 'Grado ' + r.grado}</span>
+        ${(() => {
+          const _pag = { 'saber-3': '1-3', 'saber-5': '4-5', 'saber-9': '8-9', 'saber-11': '10-11' };
+          return resultados.slice(0, 20).map(r => {
+            const gNav = r.grupo || (r.prueba ? _pag[r.prueba] : null) || gradoAGrupoEBC(r.grado || '8');
+            const gLabel = r.grupo || (r.prueba ? _pag[r.prueba] : null) || ('Grado ' + r.grado);
+            return `
+              <div class="card card-accent mt-2" data-action="navigate" data-value="#/area/${r.area}/${gNav}" style="cursor:pointer">
+                <div class="card-body">
+                  <div class="flex gap-2 mb-2">
+                    <span class="badge badge-${r.area === 'matematicas' ? 'mat' : r.area === 'lenguaje' ? 'len' : r.area === 'ciencias-naturales' ? 'nat' : 'soc'}">${AREAS_EBC[r.area]?.nombre || r.area}</span>
+                    <span class="badge badge-muted">${r.tipo.toUpperCase()}</span>
+                    <span class="badge badge-muted">${gLabel}</span>
+                  </div>
+                  <p class="text-sm text-secondary">${r.texto}</p>
+                </div>
               </div>
-              <p class="text-sm text-secondary">${r.texto}</p>
-            </div>
-          </div>
-        `).join('')}
+            `;
+          }).join('');
+        })()}
       ` : query ? '<p class="text-muted mt-4">Sin resultados para "' + query + '"</p>' : ''}
     `;
   },
@@ -902,7 +1180,7 @@ const App = {
             </div>
             <div class="ia-action-btn" data-action="ia-action" data-value="interdisciplinar">
               <div class="ia-action-btn-title">Conexión Interdisciplinar</div>
-              <div class="ia-action-btn-desc">Proyectos integradores entre dos áreas EBC</div>
+              <div class="ia-action-btn-desc">Proyectos integradores entre dos áreas curriculares</div>
             </div>
             <div class="ia-action-btn" data-action="ia-action" data-value="sugerenciaPedagogica">
               <div class="ia-action-btn-title">Sugerencia Pedagógica</div>
@@ -947,7 +1225,7 @@ const App = {
         </li>
       </ul>
 
-      <div class="sidebar-label">Áreas EBC</div>
+      <div class="sidebar-label">Áreas Curriculares</div>
       <ul class="sidebar-nav">
         ${Object.entries(AREAS_EBC).map(([id, info]) => `
           <li class="sidebar-item ${this.state.area === id && this.state.vista === 'area' ? 'active' : ''}" data-action="navigate" data-value="#/area/${id}/${this.state.grupo || '8-9'}">

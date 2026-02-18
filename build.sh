@@ -1,24 +1,24 @@
 #!/bin/bash
-# build.sh — Genera articulador-ebc.html autocontenido (standalone)
+# build.sh — Genera articulador-saber-icfes.html autocontenido (standalone)
 # Uso: bash build.sh
 
 set -e
 cd "$(dirname "$0")"
 
-echo "🔨 Construyendo Articulador Curricular EBC (standalone)..."
+echo "🔨 Construyendo Articulador Curricular Saber ICFES (standalone)..."
 
 # Leer CSS
 CSS=$(cat src/ui/styles.css)
 
 # Leer todos los JS de datos
 DATA_JS=""
-for f in src/data/ebc-matematicas.js src/data/ebc-lenguaje.js src/data/ebc-naturales.js src/data/ebc-sociales.js src/data/dba.js src/data/planes-matematicas.js src/data/progresion-vertical.js; do
+for f in src/data/ebc-matematicas.js src/data/ebc-lenguaje.js src/data/ebc-naturales.js src/data/ebc-sociales.js src/data/dba.js src/data/planes-matematicas.js src/data/progresion-vertical.js src/data/icfes-matematicas.js src/data/icfes-lectura-critica.js; do
   DATA_JS+="$(cat "$f")"$'\n'
 done
 
 # Leer JS del motor
 ENGINE_JS=""
-for f in src/engine/filtros.js src/engine/articulacion.js src/engine/busqueda.js src/engine/exportacion.js src/engine/almacenamiento.js; do
+for f in src/engine/filtros.js src/engine/articulacion.js src/engine/busqueda.js src/engine/exportacion.js src/engine/almacenamiento.js src/engine/icfes.js; do
   ENGINE_JS+="$(cat "$f")"$'\n'
 done
 
@@ -30,21 +30,21 @@ UI_JS=$(cat src/ui/app.js)
 
 # Generar HTML standalone
 mkdir -p dist
-cat > dist/articulador-ebc.html << 'HTMLEOF'
+cat > dist/articulador-saber-icfes.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Articulador Curricular EBC — MEN Colombia</title>
-  <meta name="description" content="Articulador de Estándares Básicos de Competencias del MEN Colombia. Funciona 100% offline.">
+  <title>Articulador Curricular Saber ICFES — MEN Colombia</title>
+  <meta name="description" content="Articulador curricular alineado a pruebas Saber ICFES. EBC, DBA e ICFES articulados. Funciona 100% offline.">
   <meta name="theme-color" content="#0e1018">
   <style>
 HTMLEOF
 
-echo "$CSS" >> dist/articulador-ebc.html
+echo "$CSS" >> dist/articulador-saber-icfes.html
 
-cat >> dist/articulador-ebc.html << 'HTMLEOF'
+cat >> dist/articulador-saber-icfes.html << 'HTMLEOF'
   </style>
 </head>
 <body data-area="matematicas">
@@ -53,9 +53,9 @@ cat >> dist/articulador-ebc.html << 'HTMLEOF'
     <header class="app-header">
       <div class="header-brand">
         <button class="btn btn-icon btn-ghost" id="menu-btn" data-action="toggle-sidebar" style="display:none" aria-label="Menú">☰</button>
-        <div class="header-logo">EBC</div>
+        <div class="header-logo">ICFES</div>
         <div>
-          <div class="header-title">Articulador Curricular EBC</div>
+          <div class="header-title">Articulador Curricular Saber ICFES</div>
           <div class="header-subtitle">Asistente Pedagógico para el Docente Colombiano</div>
         </div>
       </div>
@@ -72,12 +72,12 @@ cat >> dist/articulador-ebc.html << 'HTMLEOF'
   <script>
 HTMLEOF
 
-echo "$DATA_JS" >> dist/articulador-ebc.html
-echo "$ENGINE_JS" >> dist/articulador-ebc.html
-echo "$IA_JS" >> dist/articulador-ebc.html
-echo "$UI_JS" >> dist/articulador-ebc.html
+echo "$DATA_JS" >> dist/articulador-saber-icfes.html
+echo "$ENGINE_JS" >> dist/articulador-saber-icfes.html
+echo "$IA_JS" >> dist/articulador-saber-icfes.html
+echo "$UI_JS" >> dist/articulador-saber-icfes.html
 
-cat >> dist/articulador-ebc.html << 'HTMLEOF'
+cat >> dist/articulador-saber-icfes.html << 'HTMLEOF'
 
   // Mobile menu
   (function() {
@@ -92,7 +92,7 @@ cat >> dist/articulador-ebc.html << 'HTMLEOF'
 </html>
 HTMLEOF
 
-SIZE=$(wc -c < dist/articulador-ebc.html)
+SIZE=$(wc -c < dist/articulador-saber-icfes.html)
 SIZE_KB=$((SIZE / 1024))
-echo "✅ Generado: dist/articulador-ebc.html (${SIZE_KB} KB)"
-echo "   Abrir en navegador: file://$(pwd)/dist/articulador-ebc.html"
+echo "✅ Generado: dist/articulador-saber-icfes.html (${SIZE_KB} KB)"
+echo "   Abrir en navegador: file://$(pwd)/dist/articulador-saber-icfes.html"

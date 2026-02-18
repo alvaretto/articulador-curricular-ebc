@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Articulador Curricular EBC — MEN Colombia</title>
-  <meta name="description" content="Articulador de Estándares Básicos de Competencias del MEN Colombia. Funciona 100% offline.">
+  <title>Articulador Curricular Saber ICFES — MEN Colombia</title>
+  <meta name="description" content="Articulador curricular alineado a pruebas Saber ICFES. EBC, DBA e ICFES articulados. Funciona 100% offline.">
   <meta name="theme-color" content="#0e1018">
   <style>
 /* ═══════════════════════════════════════════════════════════════
-   ARTICULADOR CURRICULAR EBC — Stylesheet
+   ARTICULADOR CURRICULAR SABER ICFES — Stylesheet
    Editorial Academic + Modern Dashboard aesthetic
    Colombian Ministry of Education standards navigator
    ═══════════════════════════════════════════════════════════════ */
@@ -291,16 +291,16 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 }
 
 .header-logo {
-  width: 36px;
+  width: 44px;
   height: 36px;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
   border-radius: var(--radius-sm);
-  font-size: 18px;
+  font-size: 12px;
   color: white;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   flex-shrink: 0;
 }
 
@@ -1790,6 +1790,47 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .w-full { width: 100%; }
 .hidden { display: none !important; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* === ICFES Section === */
+.icfes-aprendizaje { border-bottom: 1px solid var(--border); }
+.icfes-aprendizaje:last-child { border-bottom: none; }
+.icfes-aprendizaje > summary { padding: var(--sp-3); }
+.icfes-aprendizaje > summary::-webkit-details-marker { display: none; }
+.icfes-aprendizaje > summary::before { content: '▸ '; color: var(--text-muted); }
+.icfes-aprendizaje[open] > summary::before { content: '▾ '; }
+.icfes-evidencias { padding: 0 var(--sp-4) var(--sp-3) var(--sp-6); }
+.icfes-evidencia-item {
+  padding: var(--sp-2) 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-loose);
+  border-bottom: 1px dashed var(--border);
+}
+.icfes-evidencia-item:last-child { border-bottom: none; }
+.icfes-niveles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-3);
+}
+.icfes-nivel {
+  padding: var(--sp-3);
+  background: var(--surface-1);
+  border-radius: var(--radius-md);
+  transition: opacity 0.2s;
+}
+.icfes-nivel-activo {
+  background: var(--surface-2);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.icfes-nivel-inactivo {
+  opacity: 0.5;
+}
+.icfes-nivel-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
   </style>
 </head>
 <body data-area="matematicas">
@@ -1798,9 +1839,9 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
     <header class="app-header">
       <div class="header-brand">
         <button class="btn btn-icon btn-ghost" id="menu-btn" data-action="toggle-sidebar" style="display:none" aria-label="Menú">☰</button>
-        <div class="header-logo">EBC</div>
+        <div class="header-logo">ICFES</div>
         <div>
-          <div class="header-title">Articulador Curricular EBC</div>
+          <div class="header-title">Articulador Curricular Saber ICFES</div>
           <div class="header-subtitle">Asistente Pedagógico para el Docente Colombiano</div>
         </div>
       </div>
@@ -3623,6 +3664,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s9-01', 'mat-s9-02'],
+        evidenciasICFES: ['mat-s9-01-e1', 'mat-s9-01-e2', 'mat-s9-02-e1'],
+        nivelEsperado: 'Mínimo',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 8° (editorial Norma o Santillana)',
           'Recta numérica en cartulina',
@@ -3718,6 +3763,10 @@ const PLANES_MATEMATICAS = {
             'Determina el valor de la incógnita en una ecuación lineal.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s9-02', 'mat-s9-03', 'mat-s9-08'],
+        evidenciasICFES: ['mat-s9-02-e1', 'mat-s9-02-e2', 'mat-s9-03-e1', 'mat-s9-08-e1'],
+        nivelEsperado: 'Mínimo',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 8°',
@@ -3815,6 +3864,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s9-05', 'mat-s9-06', 'mat-s9-08'],
+        evidenciasICFES: ['mat-s9-05-e1', 'mat-s9-05-e2', 'mat-s9-06-e1', 'mat-s9-08-e1', 'mat-s9-08-e2'],
+        nivelEsperado: 'Satisfactorio',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 8°',
           'Regla, compás, transportador y escuadras',
@@ -3910,6 +3963,10 @@ const PLANES_MATEMATICAS = {
             'Calcula la probabilidad de un evento usando la razón favorable/total.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s9-06', 'mat-s9-09', 'mat-s9-10'],
+        evidenciasICFES: ['mat-s9-06-e2', 'mat-s9-06-e3', 'mat-s9-09-e1', 'mat-s9-09-e2', 'mat-s9-10-e1'],
+        nivelEsperado: 'Satisfactorio',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 8°',
@@ -4020,6 +4077,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s9-01', 'mat-s9-04'],
+        evidenciasICFES: ['mat-s9-01-e2', 'mat-s9-01-e3', 'mat-s9-04-e1', 'mat-s9-04-e2'],
+        nivelEsperado: 'Mínimo',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 9°',
           'GeoGebra para explorar la función cuadrática de forma dinámica',
@@ -4114,6 +4175,10 @@ const PLANES_MATEMATICAS = {
             'Identifica el tipo de sistema según su representación gráfica o algebraica.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s9-03', 'mat-s9-07', 'mat-s9-08'],
+        evidenciasICFES: ['mat-s9-03-e2', 'mat-s9-03-e3', 'mat-s9-07-e1', 'mat-s9-07-e2', 'mat-s9-08-e3'],
+        nivelEsperado: 'Satisfactorio',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 9°',
@@ -4211,6 +4276,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s9-04', 'mat-s9-08', 'mat-s9-10'],
+        evidenciasICFES: ['mat-s9-04-e1', 'mat-s9-04-e2', 'mat-s9-08-e2', 'mat-s9-08-e3', 'mat-s9-10-e1', 'mat-s9-10-e2'],
+        nivelEsperado: 'Satisfactorio',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 9°',
           'GeoGebra para explorar funciones lineales, exponenciales y logarítmicas',
@@ -4306,6 +4375,10 @@ const PLANES_MATEMATICAS = {
             'Determina la probabilidad condicional de un evento dado otro evento relacionado.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s9-06', 'mat-s9-09', 'mat-s9-10'],
+        evidenciasICFES: ['mat-s9-06-e2', 'mat-s9-06-e3', 'mat-s9-09-e1', 'mat-s9-09-e2', 'mat-s9-10-e2'],
+        nivelEsperado: 'Avanzado',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 9°',
@@ -4416,6 +4489,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s11-06', 'mat-s11-08'],
+        evidenciasICFES: ['mat-s11-06-e1', 'mat-s11-06-e2', 'mat-s11-08-e1', 'mat-s11-08-e2'],
+        nivelEsperado: 'Mínimo',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 10°',
           'Transportador, regla y calculadora científica con funciones trigonométricas',
@@ -4511,6 +4588,10 @@ const PLANES_MATEMATICAS = {
             'Identifica la identidad trigonométrica equivalente a una expresión dada.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s11-01', 'mat-s11-06'],
+        evidenciasICFES: ['mat-s11-01-e1', 'mat-s11-01-e2', 'mat-s11-06-e3'],
+        nivelEsperado: 'Satisfactorio',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 10°',
@@ -4608,6 +4689,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s11-05', 'mat-s11-07'],
+        evidenciasICFES: ['mat-s11-05-e1', 'mat-s11-05-e2', 'mat-s11-05-e3', 'mat-s11-07-e1'],
+        nivelEsperado: 'Satisfactorio',
+
         materialesEducativos: [
           'Texto escolar de Matemáticas 10°',
           'GeoGebra para construcción dinámica de cónicas',
@@ -4703,6 +4788,10 @@ const PLANES_MATEMATICAS = {
             'Calcula el número de combinaciones o permutaciones en una situación dada.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s11-09', 'mat-s11-10'],
+        evidenciasICFES: ['mat-s11-09-e1', 'mat-s11-09-e3', 'mat-s11-10-e1', 'mat-s11-10-e2'],
+        nivelEsperado: 'Avanzado',
 
         materialesEducativos: [
           'Texto escolar de Matemáticas 10°',
@@ -4813,6 +4902,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s11-01', 'mat-s11-02', 'mat-s11-11'],
+        evidenciasICFES: ['mat-s11-01-e1', 'mat-s11-02-e1', 'mat-s11-02-e2', 'mat-s11-11-e1'],
+        nivelEsperado: 'Mínimo',
+
         materialesEducativos: [
           'Texto de Cálculo (Stewart, Purcell o Larson, adaptado para media)',
           'GeoGebra para visualizar límites y continuidad gráficamente',
@@ -4908,6 +5001,10 @@ const PLANES_MATEMATICAS = {
             'Identifica los intervalos donde una función es creciente o decreciente usando la derivada.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s11-02', 'mat-s11-11', 'mat-s11-12'],
+        evidenciasICFES: ['mat-s11-02-e2', 'mat-s11-11-e2', 'mat-s11-11-e3', 'mat-s11-12-e1'],
+        nivelEsperado: 'Satisfactorio',
 
         materialesEducativos: [
           'Texto de Cálculo (Stewart o Purcell, adaptado para media)',
@@ -5005,6 +5102,10 @@ const PLANES_MATEMATICAS = {
           ]
         },
 
+        aprendizajesICFES: ['mat-s11-04', 'mat-s11-11', 'mat-s11-12'],
+        evidenciasICFES: ['mat-s11-04-e1', 'mat-s11-11-e2', 'mat-s11-11-e3', 'mat-s11-12-e2'],
+        nivelEsperado: 'Satisfactorio',
+
         materialesEducativos: [
           'Texto de Cálculo (Stewart o Purcell, adaptado para media)',
           'GeoGebra para visualizar sumas de Riemann y convergencia a la integral',
@@ -5100,6 +5201,10 @@ const PLANES_MATEMATICAS = {
             'Justifica y comunica el procedimiento de solución de manera clara y precisa.'
           ]
         },
+
+        aprendizajesICFES: ['mat-s11-03', 'mat-s11-04', 'mat-s11-09', 'mat-s11-12'],
+        evidenciasICFES: ['mat-s11-03-e1', 'mat-s11-04-e2', 'mat-s11-09-e2', 'mat-s11-09-e3', 'mat-s11-12-e2'],
+        nivelEsperado: 'Avanzado',
 
         materialesEducativos: [
           'Cuadernillo de simulacros ICFES (pruebas anteriores Saber 11)',
@@ -5737,6 +5842,1267 @@ if (typeof module !== 'undefined' && module.exports) {
 } else if (typeof window !== 'undefined') {
   window.PROGRESION_VERTICAL = PROGRESION_VERTICAL;
 }
+/**
+ * Marco de Referencia ICFES Saber - Matemáticas
+ * Instituto Colombiano para la Evaluación de la Educación (ICFES)
+ *
+ * Fuente oficial: Matrices de Referencia y Especificaciones de Prueba
+ * Saber 3°, 5°, 9° y Saber 11° - ICFES Colombia
+ * Disponible en: https://www.icfes.gov.co/evaluaciones/pruebas-saber/marcos-de-referencia
+ *
+ * Estructura:
+ * - 3 competencias transversales a todas las pruebas
+ * - 3 componentes temáticos (Numérico-Variacional, Geométrico-Métrico, Aleatorio)
+ * - 4 pruebas: Saber 3°, Saber 5°, Saber 9°, Saber 11°
+ * - Cada prueba incluye aprendizajes con evidencias y niveles de desempeño
+ */
+
+const ICFES_MATEMATICAS = {
+  area: 'matematicas',
+  nombre: 'Matemáticas',
+
+  // Las 3 competencias evaluadas por ICFES en matemáticas
+  competencias: [
+    {
+      id: 'razonamiento',
+      nombre: 'Razonamiento y argumentación',
+      descripcion: 'Capacidad para examinar, reflexionar y evaluar afirmaciones, inferencias y métodos matemáticos. Incluye identificar patrones, generalizar, conjeturar, justificar o refutar conclusiones y construir cadenas argumentativas.',
+    },
+    {
+      id: 'comunicacion',
+      nombre: 'Comunicación, representación y modelación',
+      descripcion: 'Capacidad para expresar ideas matemáticas de forma oral, escrita, gráfica o simbólica; traducir información entre diferentes representaciones (tablas, gráficas, expresiones algebraicas) y construir modelos de situaciones reales.',
+    },
+    {
+      id: 'resolucion',
+      nombre: 'Resolución y planteamiento de problemas',
+      descripcion: 'Capacidad para identificar, formular y resolver problemas matemáticos en diferentes contextos; seleccionar y aplicar estrategias pertinentes, verificar resultados y extender soluciones a nuevas situaciones.',
+    },
+  ],
+
+  // Los 3 componentes evaluados
+  componentes: [
+    {
+      id: 'numerico-variacional',
+      nombre: 'Numérico-Variacional',
+      descripcion: 'Abarca el pensamiento numérico (sistemas numéricos, operaciones, propiedades), el pensamiento variacional (patrones, relaciones de cambio, expresiones algebraicas, funciones y ecuaciones) y los sistemas algebraicos y analíticos.',
+    },
+    {
+      id: 'geometrico-metrico',
+      nombre: 'Geométrico-Métrico',
+      descripcion: 'Abarca el pensamiento espacial (formas, propiedades, relaciones entre figuras planas y tridimensionales, transformaciones), el pensamiento métrico (magnitudes, unidades, estimación y cálculo de medidas) y los sistemas geométricos.',
+    },
+    {
+      id: 'aleatorio',
+      nombre: 'Aleatorio',
+      descripcion: 'Abarca el pensamiento aleatorio y los sistemas de datos: recolección, organización, representación e interpretación de datos; medidas estadísticas (tendencia central, dispersión); probabilidad de eventos simples y compuestos.',
+    },
+  ],
+
+  // Pruebas por nivel
+  pruebas: {
+
+    // =========================================================
+    // SABER 3°
+    // =========================================================
+    'saber-3': {
+      nombre: 'Saber 3°',
+      grados: ['3'],
+
+      aprendizajes: [
+        {
+          id: 'mat-s3-01',
+          enunciado: 'Reconoce significados del número en diferentes contextos (medición, conteo, comparación, codificación y localización).',
+          competencia: 'comunicacion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s3-01-e1', enunciado: 'Identifica el valor posicional de las cifras en números naturales de dos y tres dígitos.' },
+            { id: 'mat-s3-01-e2', enunciado: 'Compara y ordena números naturales usando los símbolos mayor que, menor que e igual.' },
+            { id: 'mat-s3-01-e3', enunciado: 'Reconoce el número como código en situaciones cotidianas (número de casa, teléfono, código postal).' },
+          ],
+        },
+        {
+          id: 'mat-s3-02',
+          enunciado: 'Resuelve y formula problemas en situaciones de adición y sustracción con números naturales.',
+          competencia: 'resolucion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s3-02-e1', enunciado: 'Identifica la operación adecuada (suma o resta) según el tipo de situación presentada.' },
+            { id: 'mat-s3-02-e2', enunciado: 'Calcula sumas y restas de números de dos y tres cifras verificando el resultado.' },
+            { id: 'mat-s3-02-e3', enunciado: 'Propone una situación cotidiana que se resuelva con adición o sustracción.' },
+          ],
+        },
+        {
+          id: 'mat-s3-03',
+          enunciado: 'Usa diversas estrategias de cálculo y estimación para resolver problemas en situaciones multiplicativas.',
+          competencia: 'resolucion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s3-03-e1', enunciado: 'Interpreta la multiplicación como adición repetida en situaciones concretas.' },
+            { id: 'mat-s3-03-e2', enunciado: 'Resuelve problemas sencillos que requieren la multiplicación como operación principal.' },
+          ],
+        },
+        {
+          id: 'mat-s3-04',
+          enunciado: 'Reconoce y describe regularidades y patrones en secuencias numéricas y geométricas.',
+          competencia: 'razonamiento',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s3-04-e1', enunciado: 'Identifica la regla de formación de una secuencia numérica o de figuras.' },
+            { id: 'mat-s3-04-e2', enunciado: 'Predice los siguientes elementos de una secuencia aplicando la regla identificada.' },
+          ],
+        },
+        {
+          id: 'mat-s3-05',
+          enunciado: 'Reconoce y nombra figuras geométricas planas y cuerpos sólidos a partir de sus características.',
+          competencia: 'comunicacion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s3-05-e1', enunciado: 'Identifica y nombra figuras planas (círculo, triángulo, cuadrado, rectángulo) en el entorno.' },
+            { id: 'mat-s3-05-e2', enunciado: 'Clasifica figuras geométricas según el número de lados y vértices.' },
+            { id: 'mat-s3-05-e3', enunciado: 'Distingue figuras planas de cuerpos sólidos por sus propiedades.' },
+          ],
+        },
+        {
+          id: 'mat-s3-06',
+          enunciado: 'Compara y ordena objetos según atributos medibles (longitud, masa, capacidad) usando unidades convencionales y no convencionales.',
+          competencia: 'comunicacion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s3-06-e1', enunciado: 'Estima y mide longitudes usando el centímetro y el metro.' },
+            { id: 'mat-s3-06-e2', enunciado: 'Compara dos objetos según su longitud, masa o capacidad y los ordena.' },
+          ],
+        },
+        {
+          id: 'mat-s3-07',
+          enunciado: 'Representa datos del entorno usando pictogramas y diagramas de barras, e interpreta la información presentada.',
+          competencia: 'comunicacion',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s3-07-e1', enunciado: 'Lee pictogramas y diagramas de barras respondiendo preguntas sobre los datos.' },
+            { id: 'mat-s3-07-e2', enunciado: 'Registra datos cualitativos en tablas y los representa con pictogramas sencillos.' },
+          ],
+        },
+        {
+          id: 'mat-s3-08',
+          enunciado: 'Identifica, en situaciones cotidianas, la posibilidad de ocurrencia de eventos (posible, imposible, seguro).',
+          competencia: 'razonamiento',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s3-08-e1', enunciado: 'Clasifica eventos como posibles, imposibles o seguros en situaciones de la vida diaria.' },
+            { id: 'mat-s3-08-e2', enunciado: 'Argumenta por qué un evento es más probable que otro en una situación concreta.' },
+          ],
+        },
+      ],
+
+      niveles: [
+        {
+          nombre: 'Insuficiente',
+          rango: [100, 226],
+          color: '#EF4444',
+          descripcion: 'El estudiante no supera las preguntas de menor complejidad de la prueba. No reconoce el valor posicional de números de dos cifras ni identifica figuras geométricas básicas a partir de sus propiedades.',
+          aprendizajesEsperados: [],
+        },
+        {
+          nombre: 'Mínimo',
+          rango: [226, 295],
+          color: '#F59E0B',
+          descripcion: 'El estudiante reconoce el valor posicional de números naturales de hasta tres cifras, resuelve sumas y restas sencillas, identifica figuras geométricas básicas por su nombre y lee datos en pictogramas simples.',
+          aprendizajesEsperados: ['mat-s3-01', 'mat-s3-05', 'mat-s3-07'],
+        },
+        {
+          nombre: 'Satisfactorio',
+          rango: [295, 380],
+          color: '#10B981',
+          descripcion: 'El estudiante resuelve problemas que requieren adición, sustracción y multiplicación en contextos cotidianos, identifica regularidades en secuencias, mide longitudes usando unidades convencionales e interpreta diagramas de barras.',
+          aprendizajesEsperados: ['mat-s3-01', 'mat-s3-02', 'mat-s3-03', 'mat-s3-05', 'mat-s3-06', 'mat-s3-07'],
+        },
+        {
+          nombre: 'Avanzado',
+          rango: [380, 500],
+          color: '#3B82F6',
+          descripcion: 'El estudiante formula y resuelve problemas en distintos contextos, predice elementos en secuencias numéricas y geométricas, compara magnitudes usando unidades del sistema métrico y argumenta sobre la posibilidad de ocurrencia de eventos.',
+          aprendizajesEsperados: ['mat-s3-01', 'mat-s3-02', 'mat-s3-03', 'mat-s3-04', 'mat-s3-05', 'mat-s3-06', 'mat-s3-07', 'mat-s3-08'],
+        },
+      ],
+    },
+
+    // =========================================================
+    // SABER 5°
+    // =========================================================
+    'saber-5': {
+      nombre: 'Saber 5°',
+      grados: ['5'],
+
+      aprendizajes: [
+        {
+          id: 'mat-s5-01',
+          enunciado: 'Resuelve y formula problemas que involucran operaciones con números naturales, fracciones y decimales en diferentes contextos.',
+          competencia: 'resolucion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s5-01-e1', enunciado: 'Identifica la operación o secuencia de operaciones necesaria para resolver un problema con fracciones o decimales.' },
+            { id: 'mat-s5-01-e2', enunciado: 'Calcula resultados de operaciones mixtas con números naturales, fracciones y decimales.' },
+            { id: 'mat-s5-01-e3', enunciado: 'Verifica la razonabilidad del resultado de una operación en un contexto dado.' },
+          ],
+        },
+        {
+          id: 'mat-s5-02',
+          enunciado: 'Establece relaciones entre fracciones, decimales y porcentajes y los usa en situaciones de proporcionalidad.',
+          competencia: 'comunicacion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s5-02-e1', enunciado: 'Convierte fracciones a decimales y porcentajes, y viceversa, en situaciones concretas.' },
+            { id: 'mat-s5-02-e2', enunciado: 'Identifica porcentajes en situaciones cotidianas como descuentos y ofertas.' },
+          ],
+        },
+        {
+          id: 'mat-s5-03',
+          enunciado: 'Reconoce y predice patrones numéricos y geométricos, y los representa con expresiones sencillas.',
+          competencia: 'razonamiento',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s5-03-e1', enunciado: 'Identifica la regla de formación de una secuencia y la expresa verbalmente o con una expresión simple.' },
+            { id: 'mat-s5-03-e2', enunciado: 'Predice elementos lejanos de una secuencia usando la regla identificada.' },
+          ],
+        },
+        {
+          id: 'mat-s5-04',
+          enunciado: 'Calcula perímetros y áreas de figuras planas y aplica estos conceptos en la resolución de problemas.',
+          competencia: 'resolucion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s5-04-e1', enunciado: 'Calcula el perímetro y el área de figuras planas regulares e irregulares.' },
+            { id: 'mat-s5-04-e2', enunciado: 'Resuelve problemas cotidianos que requieren calcular área o perímetro de figuras compuestas.' },
+            { id: 'mat-s5-04-e3', enunciado: 'Distingue entre área y perímetro, y reconoce cuál es el atributo relevante según el problema.' },
+          ],
+        },
+        {
+          id: 'mat-s5-05',
+          enunciado: 'Identifica y describe características de figuras tridimensionales (prismas, pirámides, cilindros, conos y esferas).',
+          competencia: 'comunicacion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s5-05-e1', enunciado: 'Clasifica cuerpos geométricos según sus caras, aristas y vértices.' },
+            { id: 'mat-s5-05-e2', enunciado: 'Relaciona un cuerpo geométrico con su representación plana (desarrollo o vista).' },
+          ],
+        },
+        {
+          id: 'mat-s5-06',
+          enunciado: 'Realiza conversiones entre unidades de medida del sistema métrico para longitud, masa, capacidad y tiempo.',
+          competencia: 'comunicacion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s5-06-e1', enunciado: 'Convierte medidas entre unidades del sistema métrico (km, m, cm; kg, g; l, ml).' },
+            { id: 'mat-s5-06-e2', enunciado: 'Resuelve problemas que requieren convertir unidades para comparar medidas.' },
+          ],
+        },
+        {
+          id: 'mat-s5-07',
+          enunciado: 'Recopila, organiza y representa datos en tablas de frecuencia y gráficas estadísticas, e interpreta los resultados.',
+          competencia: 'comunicacion',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s5-07-e1', enunciado: 'Organiza datos en tablas de frecuencias y los representa en gráficas de barras o circulares.' },
+            { id: 'mat-s5-07-e2', enunciado: 'Lee e interpreta información presentada en diferentes tipos de gráficas estadísticas.' },
+            { id: 'mat-s5-07-e3', enunciado: 'Calcula la moda, la mediana y el promedio de un conjunto de datos e interpreta su significado.' },
+          ],
+        },
+        {
+          id: 'mat-s5-08',
+          enunciado: 'Conjetura y verifica predicciones acerca de la posibilidad de ocurrencia de eventos en situaciones aleatorias.',
+          competencia: 'razonamiento',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s5-08-e1', enunciado: 'Estima la probabilidad de un evento simple usando la frecuencia relativa.' },
+            { id: 'mat-s5-08-e2', enunciado: 'Compara la probabilidad de dos eventos y justifica cuál es más probable.' },
+          ],
+        },
+      ],
+
+      niveles: [
+        {
+          nombre: 'Insuficiente',
+          rango: [100, 233],
+          color: '#EF4444',
+          descripcion: 'El estudiante no supera las preguntas de menor complejidad de la prueba. No resuelve operaciones básicas con fracciones ni interpreta gráficas estadísticas sencillas.',
+          aprendizajesEsperados: [],
+        },
+        {
+          nombre: 'Mínimo',
+          rango: [233, 295],
+          color: '#F59E0B',
+          descripcion: 'El estudiante resuelve operaciones con números naturales, identifica figuras tridimensionales por su nombre, lee tablas de frecuencia sencillas y reconoce porcentajes en contextos directos.',
+          aprendizajesEsperados: ['mat-s5-01', 'mat-s5-05', 'mat-s5-07'],
+        },
+        {
+          nombre: 'Satisfactorio',
+          rango: [295, 376],
+          color: '#10B981',
+          descripcion: 'El estudiante resuelve problemas con fracciones, decimales y porcentajes, calcula perímetros y áreas de figuras planas, convierte unidades del sistema métrico e interpreta gráficas estadísticas calculando medidas de tendencia central.',
+          aprendizajesEsperados: ['mat-s5-01', 'mat-s5-02', 'mat-s5-04', 'mat-s5-05', 'mat-s5-06', 'mat-s5-07'],
+        },
+        {
+          nombre: 'Avanzado',
+          rango: [376, 500],
+          color: '#3B82F6',
+          descripcion: 'El estudiante formula y resuelve problemas complejos con operaciones mixtas, predice patrones y los representa algebraicamente, calcula áreas de figuras compuestas y estima probabilidades usando la frecuencia relativa.',
+          aprendizajesEsperados: ['mat-s5-01', 'mat-s5-02', 'mat-s5-03', 'mat-s5-04', 'mat-s5-05', 'mat-s5-06', 'mat-s5-07', 'mat-s5-08'],
+        },
+      ],
+    },
+
+    // =========================================================
+    // SABER 9°
+    // =========================================================
+    'saber-9': {
+      nombre: 'Saber 9°',
+      grados: ['9'],
+
+      aprendizajes: [
+        {
+          id: 'mat-s9-01',
+          enunciado: 'Utiliza números reales en sus diferentes representaciones y en distintos contextos para resolver problemas.',
+          competencia: 'resolucion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s9-01-e1', enunciado: 'Clasifica números reales (racionales e irracionales) y los ubica en la recta numérica.' },
+            { id: 'mat-s9-01-e2', enunciado: 'Opera con números reales aplicando jerarquía de operaciones y propiedades (conmutativa, asociativa, distributiva).' },
+            { id: 'mat-s9-01-e3', enunciado: 'Resuelve problemas que requieren cálculo exacto o aproximado con números reales.' },
+          ],
+        },
+        {
+          id: 'mat-s9-02',
+          enunciado: 'Construye expresiones algebraicas que modelan situaciones de variación y las usa para resolver problemas.',
+          competencia: 'comunicacion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s9-02-e1', enunciado: 'Traduce situaciones verbales a expresiones algebraicas y viceversa.' },
+            { id: 'mat-s9-02-e2', enunciado: 'Simplifica expresiones algebraicas usando propiedades de las operaciones.' },
+          ],
+        },
+        {
+          id: 'mat-s9-03',
+          enunciado: 'Resuelve ecuaciones e inecuaciones lineales y las usa para modelar situaciones cotidianas.',
+          competencia: 'resolucion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s9-03-e1', enunciado: 'Resuelve ecuaciones lineales de una variable y verifica la solución.' },
+            { id: 'mat-s9-03-e2', enunciado: 'Plantea y resuelve un problema cotidiano formulando una ecuación lineal.' },
+            { id: 'mat-s9-03-e3', enunciado: 'Resuelve sistemas de ecuaciones lineales con dos incógnitas por distintos métodos.' },
+          ],
+        },
+        {
+          id: 'mat-s9-04',
+          enunciado: 'Identifica y representa funciones lineales y cuadráticas como modelos de situaciones de variación.',
+          competencia: 'comunicacion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s9-04-e1', enunciado: 'Grafica funciones lineales y cuadráticas en el plano cartesiano identificando sus características.' },
+            { id: 'mat-s9-04-e2', enunciado: 'Interpreta el significado de los parámetros de una función lineal (pendiente e intercepto) en un contexto.' },
+          ],
+        },
+        {
+          id: 'mat-s9-05',
+          enunciado: 'Aplica criterios de congruencia y semejanza de triángulos en la resolución de problemas geométricos.',
+          competencia: 'razonamiento',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s9-05-e1', enunciado: 'Identifica triángulos congruentes o semejantes a partir de sus medidas y justifica el criterio usado.' },
+            { id: 'mat-s9-05-e2', enunciado: 'Calcula medidas desconocidas en figuras semejantes usando razones de proporcionalidad.' },
+          ],
+        },
+        {
+          id: 'mat-s9-06',
+          enunciado: 'Aplica el Teorema de Pitágoras y relaciones métricas para calcular longitudes en situaciones geométricas.',
+          competencia: 'resolucion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s9-06-e1', enunciado: 'Usa el Teorema de Pitágoras para calcular la longitud de un lado desconocido de un triángulo rectángulo.' },
+            { id: 'mat-s9-06-e2', enunciado: 'Resuelve situaciones de medición indirecta usando propiedades de triángulos y el Teorema de Pitágoras.' },
+            { id: 'mat-s9-06-e3', enunciado: 'Calcula áreas y volúmenes de figuras y cuerpos geométricos en situaciones problema.' },
+          ],
+        },
+        {
+          id: 'mat-s9-07',
+          enunciado: 'Describe y aplica las propiedades de las transformaciones geométricas (traslaciones, rotaciones, reflexiones y homotecias).',
+          competencia: 'comunicacion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s9-07-e1', enunciado: 'Identifica y describe el tipo de transformación aplicada a una figura en el plano cartesiano.' },
+            { id: 'mat-s9-07-e2', enunciado: 'Determina la imagen de una figura bajo una transformación dada.' },
+          ],
+        },
+        {
+          id: 'mat-s9-08',
+          enunciado: 'Usa medidas de tendencia central (media, mediana, moda) y dispersión (rango, desviación estándar) para interpretar y comparar conjuntos de datos.',
+          competencia: 'comunicacion',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s9-08-e1', enunciado: 'Calcula e interpreta la media, mediana y moda de un conjunto de datos en un contexto real.' },
+            { id: 'mat-s9-08-e2', enunciado: 'Compara dos conjuntos de datos usando medidas de tendencia central e identifica diferencias.' },
+            { id: 'mat-s9-08-e3', enunciado: 'Interpreta el rango y la desviación estándar como indicadores de dispersión.' },
+          ],
+        },
+        {
+          id: 'mat-s9-09',
+          enunciado: 'Calcula probabilidades de eventos simples y compuestos usando diferentes métodos.',
+          competencia: 'resolucion',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s9-09-e1', enunciado: 'Calcula la probabilidad de eventos simples usando listados y diagramas de árbol.' },
+            { id: 'mat-s9-09-e2', enunciado: 'Determina la probabilidad de eventos complementarios y aplica la regla de la adición.' },
+          ],
+        },
+        {
+          id: 'mat-s9-10',
+          enunciado: 'Interpreta y compara resultados de estudios estadísticos provenientes de medios de comunicación y diversas fuentes.',
+          competencia: 'razonamiento',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s9-10-e1', enunciado: 'Evalúa la pertinencia y confiabilidad de información estadística publicada en medios.' },
+            { id: 'mat-s9-10-e2', enunciado: 'Identifica posibles errores o sesgos en la presentación de datos estadísticos.' },
+          ],
+        },
+      ],
+
+      niveles: [
+        {
+          nombre: 'Insuficiente',
+          rango: [100, 233],
+          color: '#EF4444',
+          descripcion: 'El estudiante no supera las preguntas de menor complejidad de la prueba. No resuelve ecuaciones lineales sencillas ni interpreta gráficas estadísticas básicas.',
+          aprendizajesEsperados: [],
+        },
+        {
+          nombre: 'Mínimo',
+          rango: [233, 295],
+          color: '#F59E0B',
+          descripcion: 'El estudiante opera con números reales en situaciones directas, resuelve ecuaciones lineales de una variable, identifica figuras congruentes o semejantes y calcula medidas de tendencia central de conjuntos de datos simples.',
+          aprendizajesEsperados: ['mat-s9-01', 'mat-s9-03', 'mat-s9-05', 'mat-s9-08'],
+        },
+        {
+          nombre: 'Satisfactorio',
+          rango: [295, 380],
+          color: '#10B981',
+          descripcion: 'El estudiante modela situaciones con expresiones algebraicas, resuelve sistemas de ecuaciones, aplica el Teorema de Pitágoras, interpreta funciones lineales e interpreta estadísticas usando medidas de dispersión.',
+          aprendizajesEsperados: ['mat-s9-01', 'mat-s9-02', 'mat-s9-03', 'mat-s9-04', 'mat-s9-05', 'mat-s9-06', 'mat-s9-08', 'mat-s9-09'],
+        },
+        {
+          nombre: 'Avanzado',
+          rango: [380, 500],
+          color: '#3B82F6',
+          descripcion: 'El estudiante resuelve problemas complejos integrando álgebra y geometría, describe transformaciones en el plano, calcula probabilidades de eventos compuestos y evalúa críticamente información estadística de fuentes externas.',
+          aprendizajesEsperados: ['mat-s9-01', 'mat-s9-02', 'mat-s9-03', 'mat-s9-04', 'mat-s9-05', 'mat-s9-06', 'mat-s9-07', 'mat-s9-08', 'mat-s9-09', 'mat-s9-10'],
+        },
+      ],
+    },
+
+    // =========================================================
+    // SABER 11°
+    // =========================================================
+    'saber-11': {
+      nombre: 'Saber 11°',
+      grados: ['11'],
+
+      aprendizajes: [
+        {
+          id: 'mat-s11-01',
+          enunciado: 'Modela situaciones de variación con funciones polinómicas, racionales, exponenciales y logarítmicas.',
+          competencia: 'comunicacion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s11-01-e1', enunciado: 'Identifica el tipo de función que mejor modela una situación de variación a partir de su tabla o gráfica.' },
+            { id: 'mat-s11-01-e2', enunciado: 'Construye la expresión algebraica de una función a partir de sus características o puntos conocidos.' },
+            { id: 'mat-s11-01-e3', enunciado: 'Interpreta los parámetros de una función exponencial o logarítmica en un contexto real.' },
+          ],
+        },
+        {
+          id: 'mat-s11-02',
+          enunciado: 'Analiza las propiedades de las funciones (dominio, rango, crecimiento, decrecimiento, máximos y mínimos) a través de su gráfica.',
+          competencia: 'razonamiento',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s11-02-e1', enunciado: 'Determina dominio y rango de una función a partir de su gráfica o expresión algebraica.' },
+            { id: 'mat-s11-02-e2', enunciado: 'Identifica intervalos de crecimiento, decrecimiento y puntos extremos en la gráfica de una función.' },
+          ],
+        },
+        {
+          id: 'mat-s11-03',
+          enunciado: 'Resuelve y formula ecuaciones e inecuaciones de forma algebraica y gráfica, incluyendo sistemas no lineales.',
+          competencia: 'resolucion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s11-03-e1', enunciado: 'Resuelve ecuaciones de segundo grado por factorización, completación de cuadrados y fórmula cuadrática.' },
+            { id: 'mat-s11-03-e2', enunciado: 'Resuelve inecuaciones lineales y cuadráticas, y representa la solución en la recta numérica.' },
+            { id: 'mat-s11-03-e3', enunciado: 'Resuelve sistemas de ecuaciones lineales con dos o tres variables por métodos algebraicos.' },
+          ],
+        },
+        {
+          id: 'mat-s11-04',
+          enunciado: 'Valida procedimientos y estrategias matemáticas utilizadas para dar solución a problemas.',
+          competencia: 'razonamiento',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s11-04-e1', enunciado: 'Justifica cada paso de un procedimiento algebraico usando propiedades y definiciones.' },
+            { id: 'mat-s11-04-e2', enunciado: 'Evalúa la pertinencia de un procedimiento para resolver un problema y propone alternativas.' },
+          ],
+        },
+        {
+          id: 'mat-s11-05',
+          enunciado: 'Usa la geometría analítica para describir y analizar relaciones entre figuras en el plano cartesiano.',
+          competencia: 'comunicacion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s11-05-e1', enunciado: 'Determina la ecuación de la recta a partir de dos puntos, un punto y la pendiente, o la pendiente y el intercepto.' },
+            { id: 'mat-s11-05-e2', enunciado: 'Calcula la distancia entre dos puntos y el punto medio de un segmento en el plano cartesiano.' },
+            { id: 'mat-s11-05-e3', enunciado: 'Identifica y usa las ecuaciones de la circunferencia y la parábola para resolver problemas.' },
+          ],
+        },
+        {
+          id: 'mat-s11-06',
+          enunciado: 'Aplica relaciones trigonométricas y las funciones seno, coseno y tangente para resolver situaciones de medición directa e indirecta.',
+          competencia: 'resolucion',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s11-06-e1', enunciado: 'Usa las razones trigonométricas (seno, coseno, tangente) para calcular medidas en triángulos rectángulos.' },
+            { id: 'mat-s11-06-e2', enunciado: 'Resuelve problemas de medición indirecta usando la ley de senos o la ley de cosenos.' },
+            { id: 'mat-s11-06-e3', enunciado: 'Interpreta la gráfica de las funciones trigonométricas e identifica sus propiedades (amplitud, periodo, fase).' },
+          ],
+        },
+        {
+          id: 'mat-s11-07',
+          enunciado: 'Generaliza propiedades de figuras geométricas para construir argumentos y establecer relaciones en el plano y el espacio.',
+          competencia: 'razonamiento',
+          componente: 'geometrico-metrico',
+          evidencias: [
+            { id: 'mat-s11-07-e1', enunciado: 'Construye argumentos geométricos basados en propiedades de figuras y relaciones entre ángulos.' },
+            { id: 'mat-s11-07-e2', enunciado: 'Aplica propiedades de figuras planas y sólidos para calcular áreas y volúmenes en situaciones problema.' },
+          ],
+        },
+        {
+          id: 'mat-s11-08',
+          enunciado: 'Interpreta y utiliza conceptos de media, varianza y desviación estándar para analizar y comparar conjuntos de datos.',
+          competencia: 'comunicacion',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s11-08-e1', enunciado: 'Calcula e interpreta la varianza y la desviación estándar de un conjunto de datos.' },
+            { id: 'mat-s11-08-e2', enunciado: 'Compara dos distribuciones de datos usando medidas de tendencia central y de dispersión.' },
+            { id: 'mat-s11-08-e3', enunciado: 'Interpreta la distribución normal y la usa para describir comportamientos de poblaciones.' },
+          ],
+        },
+        {
+          id: 'mat-s11-09',
+          enunciado: 'Calcula probabilidades usando los modelos laplaciano, frecuentista y axiomático, incluyendo probabilidad condicional.',
+          competencia: 'resolucion',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s11-09-e1', enunciado: 'Calcula la probabilidad de eventos simples y compuestos usando la regla de la adición y la multiplicación.' },
+            { id: 'mat-s11-09-e2', enunciado: 'Determina la probabilidad condicional de un evento dado otro usando la definición o el Teorema de Bayes.' },
+            { id: 'mat-s11-09-e3', enunciado: 'Usa diagramas de árbol y tablas de contingencia para calcular probabilidades en experimentos compuestos.' },
+          ],
+        },
+        {
+          id: 'mat-s11-10',
+          enunciado: 'Interpreta resultados estadísticos para hacer inferencias y tomar decisiones en contextos reales.',
+          competencia: 'razonamiento',
+          componente: 'aleatorio',
+          evidencias: [
+            { id: 'mat-s11-10-e1', enunciado: 'Evalúa si una muestra es representativa de una población y reconoce sesgos en la selección.' },
+            { id: 'mat-s11-10-e2', enunciado: 'Interpreta resultados de estudios estadísticos y extrae conclusiones válidas sobre la población.' },
+          ],
+        },
+        {
+          id: 'mat-s11-11',
+          enunciado: 'Usa el concepto de límite y la noción de derivada para analizar la variación de una función en un contexto.',
+          competencia: 'razonamiento',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s11-11-e1', enunciado: 'Estima el límite de una función en un punto usando tablas de valores o la gráfica.' },
+            { id: 'mat-s11-11-e2', enunciado: 'Interpreta la derivada como tasa de cambio instantánea en situaciones de variación.' },
+            { id: 'mat-s11-11-e3', enunciado: 'Usa la derivada para identificar intervalos de crecimiento, decrecimiento y extremos de una función.' },
+          ],
+        },
+        {
+          id: 'mat-s11-12',
+          enunciado: 'Resuelve problemas de optimización en diferentes contextos usando modelos matemáticos y razonamiento algebraico.',
+          competencia: 'resolucion',
+          componente: 'numerico-variacional',
+          evidencias: [
+            { id: 'mat-s11-12-e1', enunciado: 'Formula una función objetivo a partir de las condiciones de un problema de optimización.' },
+            { id: 'mat-s11-12-e2', enunciado: 'Determina el valor máximo o mínimo de una función en un intervalo y lo interpreta en el contexto del problema.' },
+          ],
+        },
+      ],
+
+      niveles: [
+        {
+          nombre: 'Insuficiente',
+          rango: [0, 35],
+          color: '#EF4444',
+          descripcion: 'El estudiante no supera las preguntas de menor complejidad de la prueba. No resuelve ecuaciones lineales ni interpreta gráficas de funciones básicas.',
+          aprendizajesEsperados: [],
+        },
+        {
+          nombre: 'Mínimo',
+          rango: [36, 50],
+          color: '#F59E0B',
+          descripcion: 'El estudiante resuelve problemas rutinarios con operaciones básicas sobre números reales. Identifica información puntual en tablas y gráficos. Resuelve ecuaciones lineales y calcula medidas de tendencia central.',
+          aprendizajesEsperados: ['mat-s11-03', 'mat-s11-05', 'mat-s11-08'],
+        },
+        {
+          nombre: 'Satisfactorio',
+          rango: [51, 70],
+          color: '#10B981',
+          descripcion: 'El estudiante resuelve problemas no rutinarios que requieren modelar situaciones con funciones. Aplica relaciones trigonométricas y geometría analítica. Interpreta datos estadísticos con medidas de dispersión y calcula probabilidades condicionales.',
+          aprendizajesEsperados: ['mat-s11-01', 'mat-s11-02', 'mat-s11-03', 'mat-s11-05', 'mat-s11-06', 'mat-s11-08', 'mat-s11-09'],
+        },
+        {
+          nombre: 'Avanzado',
+          rango: [71, 100],
+          color: '#3B82F6',
+          descripcion: 'El estudiante resuelve problemas complejos que requieren integrar varios conceptos matemáticos. Argumenta y valida estrategias matemáticas. Generaliza soluciones, usa el concepto de derivada como herramienta de análisis y resuelve problemas de optimización.',
+          aprendizajesEsperados: ['mat-s11-01', 'mat-s11-02', 'mat-s11-03', 'mat-s11-04', 'mat-s11-05', 'mat-s11-06', 'mat-s11-07', 'mat-s11-08', 'mat-s11-09', 'mat-s11-10', 'mat-s11-11', 'mat-s11-12'],
+        },
+      ],
+    },
+  },
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { ICFES_MATEMATICAS }
+}
+/**
+ * Marco de Referencia ICFES Saber - Lectura Crítica / Lenguaje
+ * Instituto Colombiano para la Evaluación de la Educación (ICFES)
+ *
+ * Fuente oficial: Matrices de Referencia y Especificaciones de Prueba
+ * Saber 3°, 5°, 9° (Lenguaje) y Saber 11° (Lectura Crítica) - ICFES Colombia
+ * Disponible en: https://www.icfes.gov.co/evaluaciones/pruebas-saber/marcos-de-referencia
+ *
+ * Estructura:
+ * - 3 competencias transversales a todas las pruebas
+ * - 3 componentes temáticos (Semántico, Sintáctico, Pragmático)
+ * - 4 pruebas: Saber 3°, Saber 5°, Saber 9°, Saber 11°
+ * - Cada prueba incluye aprendizajes con evidencias y niveles de desempeño
+ */
+
+const ICFES_LECTURA_CRITICA = {
+  area: 'lenguaje',
+  nombre: 'Lectura Crítica',
+
+  // Las 3 competencias evaluadas por ICFES en Lectura Crítica / Lenguaje
+  competencias: [
+    {
+      id: 'identificar',
+      nombre: 'Identificar y entender contenidos locales',
+      descripcion: 'Capacidad para ubicar información explícita en un texto, identificar el significado de palabras y expresiones, reconocer datos puntuales y comprender los contenidos locales que conforman un texto.',
+    },
+    {
+      id: 'comprender',
+      nombre: 'Comprender cómo se articulan las partes de un texto',
+      descripcion: 'Capacidad para comprender la estructura global de un texto, las relaciones entre sus partes, la coherencia y cohesión, y darle un sentido global al texto.',
+    },
+    {
+      id: 'reflexionar',
+      nombre: 'Reflexionar y evaluar un texto',
+      descripcion: 'Capacidad para evaluar el contenido y la forma de un texto, reconocer las intenciones del autor, identificar supuestos e implicaciones, y asumir una posición crítica frente a lo leído.',
+    },
+  ],
+
+  // Los 3 componentes evaluados
+  componentes: [
+    {
+      id: 'semantico',
+      nombre: 'Semántico',
+      descripcion: 'Qué dice el texto: significados literales e inferenciales, relaciones de significado entre palabras, proposiciones y párrafos, tema principal y subtemas, referencias y sentidos figurados.',
+    },
+    {
+      id: 'sintactico',
+      nombre: 'Sintáctico',
+      descripcion: 'Cómo lo dice: estructura del texto, organización de párrafos, uso de conectores y marcadores textuales, relaciones entre oraciones, concordancia gramatical y tipología textual.',
+    },
+    {
+      id: 'pragmatico',
+      nombre: 'Pragmático',
+      descripcion: 'Para qué lo dice: intención comunicativa del autor, contexto de producción y recepción, propósito del texto, relación autor-lector, tipo de audiencia y efecto buscado en el lector.',
+    },
+  ],
+
+  // Pruebas por nivel
+  pruebas: {
+
+    // =========================================================
+    // SABER 3°
+    // =========================================================
+    'saber-3': {
+      nombre: 'Saber 3°',
+      grados: ['3'],
+
+      aprendizajes: [
+        // --- Semántico ---
+        {
+          id: 'lc-s3-01',
+          enunciado: 'Identifica el significado de palabras y expresiones a partir del contexto en textos narrativos cortos.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s3-01-e1', enunciado: 'Reconoce el significado de una palabra desconocida usando las pistas del texto.' },
+            { id: 'lc-s3-01-e2', enunciado: 'Relaciona palabras con sus sinónimos o significados cercanos según el contexto.' },
+          ],
+        },
+        {
+          id: 'lc-s3-02',
+          enunciado: 'Reconoce la idea principal de un texto narrativo o informativo breve.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s3-02-e1', enunciado: 'Señala de qué trata principalmente el texto leído.' },
+            { id: 'lc-s3-02-e2', enunciado: 'Distingue la idea principal de las ideas secundarias en un texto corto.' },
+          ],
+        },
+        {
+          id: 'lc-s3-03',
+          enunciado: 'Recupera información explícita de textos narrativos e informativos.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s3-03-e1', enunciado: 'Localiza datos específicos (personajes, lugares, hechos) en un texto.' },
+            { id: 'lc-s3-03-e2', enunciado: 'Responde preguntas literales sobre el contenido del texto.' },
+          ],
+        },
+        // --- Sintáctico ---
+        {
+          id: 'lc-s3-04',
+          enunciado: 'Reconoce la secuencia de eventos en un texto narrativo.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s3-04-e1', enunciado: 'Ordena cronológicamente los eventos de una narración.' },
+            { id: 'lc-s3-04-e2', enunciado: 'Identifica qué pasó primero, después y al final en una historia.' },
+          ],
+        },
+        {
+          id: 'lc-s3-05',
+          enunciado: 'Identifica la estructura básica de textos sencillos (inicio, nudo, desenlace en narrativos; título, subtítulos en informativos).',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s3-05-e1', enunciado: 'Señala las partes de un cuento (inicio, nudo, desenlace).' },
+            { id: 'lc-s3-05-e2', enunciado: 'Reconoce la función de títulos y subtítulos en un texto informativo.' },
+          ],
+        },
+        {
+          id: 'lc-s3-06',
+          enunciado: 'Reconoce la función de conectores básicos (y, pero, porque, entonces) en un texto.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s3-06-e1', enunciado: 'Identifica qué relación establece un conector entre dos ideas (adición, oposición, causa).' },
+            { id: 'lc-s3-06-e2', enunciado: 'Completa oraciones seleccionando el conector adecuado.' },
+          ],
+        },
+        // --- Pragmático ---
+        {
+          id: 'lc-s3-07',
+          enunciado: 'Identifica el propósito comunicativo de textos sencillos (informar, narrar, instruir).',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s3-07-e1', enunciado: 'Distingue si un texto busca contar una historia, dar instrucciones o informar sobre un tema.' },
+            { id: 'lc-s3-07-e2', enunciado: 'Relaciona el tipo de texto con su propósito comunicativo.' },
+          ],
+        },
+        {
+          id: 'lc-s3-08',
+          enunciado: 'Reconoce quién habla en el texto y a quién se dirige.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s3-08-e1', enunciado: 'Identifica al narrador o emisor de un texto.' },
+            { id: 'lc-s3-08-e2', enunciado: 'Señala a qué público va dirigido un texto (niños, adultos, todos).' },
+          ],
+        },
+      ],
+
+      niveles: [
+        {
+          nombre: 'Insuficiente',
+          rango: [100, 226],
+          color: '#EF4444',
+          descripcion: 'El estudiante no supera las preguntas de menor complejidad de la prueba. No localiza información explícita en textos cortos ni identifica el propósito comunicativo de textos sencillos.',
+          aprendizajesEsperados: [],
+        },
+        {
+          nombre: 'Mínimo',
+          rango: [226, 295],
+          color: '#F59E0B',
+          descripcion: 'El estudiante recupera información explícita de textos narrativos cortos, identifica el significado de palabras conocidas en contexto y reconoce la secuencia básica de eventos en una narración.',
+          aprendizajesEsperados: ['lc-s3-01', 'lc-s3-03', 'lc-s3-04'],
+        },
+        {
+          nombre: 'Satisfactorio',
+          rango: [295, 380],
+          color: '#10B981',
+          descripcion: 'El estudiante reconoce la idea principal de textos breves, identifica la estructura básica de textos narrativos e informativos, y distingue el propósito comunicativo de textos sencillos.',
+          aprendizajesEsperados: ['lc-s3-01', 'lc-s3-02', 'lc-s3-03', 'lc-s3-04', 'lc-s3-05', 'lc-s3-07'],
+        },
+        {
+          nombre: 'Avanzado',
+          rango: [380, 500],
+          color: '#3B82F6',
+          descripcion: 'El estudiante infiere significados a partir del contexto, comprende la función de conectores en textos, identifica quién habla y a quién se dirige un texto, y establece relaciones entre el tipo de texto y su propósito comunicativo.',
+          aprendizajesEsperados: ['lc-s3-01', 'lc-s3-02', 'lc-s3-03', 'lc-s3-04', 'lc-s3-05', 'lc-s3-06', 'lc-s3-07', 'lc-s3-08'],
+        },
+      ],
+    },
+
+    // =========================================================
+    // SABER 5°
+    // =========================================================
+    'saber-5': {
+      nombre: 'Saber 5°',
+      grados: ['5'],
+
+      aprendizajes: [
+        // --- Semántico ---
+        {
+          id: 'lc-s5-01',
+          enunciado: 'Infiere el significado de palabras y expresiones desconocidas a partir del contexto y de las relaciones semánticas del texto.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s5-01-e1', enunciado: 'Deduce el significado de una palabra por el contexto en el que aparece.' },
+            { id: 'lc-s5-01-e2', enunciado: 'Reconoce relaciones de sinonimia y antonimia entre palabras del texto.' },
+            { id: 'lc-s5-01-e3', enunciado: 'Interpreta expresiones de sentido figurado en textos narrativos.' },
+          ],
+        },
+        {
+          id: 'lc-s5-02',
+          enunciado: 'Identifica la idea principal y las ideas secundarias en textos narrativos, informativos y argumentativos.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s5-02-e1', enunciado: 'Resume el contenido global de un texto en una oración.' },
+            { id: 'lc-s5-02-e2', enunciado: 'Distingue información relevante de la información complementaria.' },
+          ],
+        },
+        {
+          id: 'lc-s5-03',
+          enunciado: 'Realiza inferencias a partir de la información explícita e implícita del texto.',
+          competencia: 'comprender',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s5-03-e1', enunciado: 'Deduce información no dicha explícitamente usando las pistas del texto.' },
+            { id: 'lc-s5-03-e2', enunciado: 'Anticipa el desenlace de una narración a partir de los indicios del texto.' },
+          ],
+        },
+        {
+          id: 'lc-s5-04',
+          enunciado: 'Establece relaciones de causa-efecto entre eventos o ideas del texto.',
+          competencia: 'comprender',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s5-04-e1', enunciado: 'Identifica la causa de un evento o la consecuencia de una acción en el texto.' },
+            { id: 'lc-s5-04-e2', enunciado: 'Explica por qué un personaje actúa de determinada manera según el texto.' },
+          ],
+        },
+        // --- Sintáctico ---
+        {
+          id: 'lc-s5-05',
+          enunciado: 'Reconoce la estructura y organización de diferentes tipos de textos (narrativo, expositivo, instructivo, argumentativo).',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s5-05-e1', enunciado: 'Identifica las partes de un texto expositivo (introducción, desarrollo, conclusión).' },
+            { id: 'lc-s5-05-e2', enunciado: 'Diferencia la estructura de un texto narrativo de la de un texto argumentativo.' },
+          ],
+        },
+        {
+          id: 'lc-s5-06',
+          enunciado: 'Identifica la función de conectores y marcadores textuales en la coherencia del texto.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s5-06-e1', enunciado: 'Reconoce conectores de adición, contraste, causa y consecuencia.' },
+            { id: 'lc-s5-06-e2', enunciado: 'Evalúa si un conector usado en un texto es adecuado para la relación entre ideas.' },
+          ],
+        },
+        {
+          id: 'lc-s5-07',
+          enunciado: 'Reconoce elementos de cohesión (pronombres, sustitución léxica, elipsis) que dan unidad al texto.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s5-07-e1', enunciado: 'Identifica a qué se refiere un pronombre o expresión sustitutiva en el texto.' },
+            { id: 'lc-s5-07-e2', enunciado: 'Reconoce cómo las sustituciones léxicas evitan la repetición y mantienen la coherencia.' },
+          ],
+        },
+        // --- Pragmático ---
+        {
+          id: 'lc-s5-08',
+          enunciado: 'Reconoce la intención comunicativa del autor en diferentes tipos de texto.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s5-08-e1', enunciado: 'Identifica si el propósito del autor es informar, persuadir, entretener o instruir.' },
+            { id: 'lc-s5-08-e2', enunciado: 'Distingue entre hechos y opiniones dentro de un texto.' },
+          ],
+        },
+        {
+          id: 'lc-s5-09',
+          enunciado: 'Identifica el punto de vista o posición del autor frente al tema tratado.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s5-09-e1', enunciado: 'Señala si el autor está a favor o en contra de una idea.' },
+            { id: 'lc-s5-09-e2', enunciado: 'Reconoce las razones o argumentos que usa el autor para defender su posición.' },
+          ],
+        },
+        {
+          id: 'lc-s5-10',
+          enunciado: 'Relaciona textos con su contexto de producción y con otros textos.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s5-10-e1', enunciado: 'Identifica el contexto social o cultural en que fue escrito un texto.' },
+            { id: 'lc-s5-10-e2', enunciado: 'Compara la información o perspectiva de dos textos sobre un mismo tema.' },
+          ],
+        },
+      ],
+
+      niveles: [
+        {
+          nombre: 'Insuficiente',
+          rango: [100, 226],
+          color: '#EF4444',
+          descripcion: 'El estudiante no supera las preguntas de menor complejidad de la prueba. No identifica la idea principal de textos breves ni reconoce el propósito comunicativo del autor.',
+          aprendizajesEsperados: [],
+        },
+        {
+          nombre: 'Mínimo',
+          rango: [226, 295],
+          color: '#F59E0B',
+          descripcion: 'El estudiante infiere el significado de palabras por contexto, identifica la idea principal de textos narrativos, establece relaciones de causa-efecto y reconoce la estructura básica de textos expositivos.',
+          aprendizajesEsperados: ['lc-s5-01', 'lc-s5-02', 'lc-s5-04', 'lc-s5-05'],
+        },
+        {
+          nombre: 'Satisfactorio',
+          rango: [295, 380],
+          color: '#10B981',
+          descripcion: 'El estudiante realiza inferencias sobre información implícita, identifica conectores y su función en la coherencia textual, y reconoce la intención comunicativa del autor en diferentes tipos de texto.',
+          aprendizajesEsperados: ['lc-s5-01', 'lc-s5-02', 'lc-s5-03', 'lc-s5-04', 'lc-s5-05', 'lc-s5-06', 'lc-s5-08'],
+        },
+        {
+          nombre: 'Avanzado',
+          rango: [380, 500],
+          color: '#3B82F6',
+          descripcion: 'El estudiante reconoce mecanismos de cohesión textual, identifica el punto de vista del autor, relaciona textos con su contexto de producción y compara perspectivas de diferentes textos sobre un mismo tema.',
+          aprendizajesEsperados: ['lc-s5-01', 'lc-s5-02', 'lc-s5-03', 'lc-s5-04', 'lc-s5-05', 'lc-s5-06', 'lc-s5-07', 'lc-s5-08', 'lc-s5-09', 'lc-s5-10'],
+        },
+      ],
+    },
+
+    // =========================================================
+    // SABER 9°
+    // =========================================================
+    'saber-9': {
+      nombre: 'Saber 9°',
+      grados: ['6', '7', '8', '9'],
+
+      aprendizajes: [
+        // --- Semántico ---
+        {
+          id: 'lc-s9-01',
+          enunciado: 'Interpreta la información explícita e implícita en textos continuos y discontinuos de complejidad media.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s9-01-e1', enunciado: 'Extrae información puntual de textos expositivos, narrativos y argumentativos.' },
+            { id: 'lc-s9-01-e2', enunciado: 'Infiere conclusiones a partir de la información presentada en tablas, gráficas o infografías.' },
+            { id: 'lc-s9-01-e3', enunciado: 'Distingue entre información literal e inferencial en un texto.' },
+          ],
+        },
+        {
+          id: 'lc-s9-02',
+          enunciado: 'Establece relaciones de significado entre palabras, proposiciones y párrafos para construir el sentido global del texto.',
+          competencia: 'comprender',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s9-02-e1', enunciado: 'Identifica las relaciones semánticas (sinonimia, antonimia, hiperonimia) entre palabras clave del texto.' },
+            { id: 'lc-s9-02-e2', enunciado: 'Relaciona información de diferentes párrafos para construir una interpretación global.' },
+          ],
+        },
+        {
+          id: 'lc-s9-03',
+          enunciado: 'Identifica y analiza figuras retóricas, recursos estilísticos y lenguaje connotativo en textos literarios y no literarios.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s9-03-e1', enunciado: 'Reconoce metáforas, símiles, hipérboles y personificaciones en textos literarios.' },
+            { id: 'lc-s9-03-e2', enunciado: 'Interpreta el efecto de los recursos estilísticos en la construcción de sentido del texto.' },
+          ],
+        },
+        // --- Sintáctico ---
+        {
+          id: 'lc-s9-04',
+          enunciado: 'Analiza la estructura organizativa de textos complejos y reconoce cómo las partes contribuyen al sentido global.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s9-04-e1', enunciado: 'Identifica la tesis, los argumentos y la conclusión en un texto argumentativo.' },
+            { id: 'lc-s9-04-e2', enunciado: 'Reconoce la función de cada parte del texto en la construcción del significado global.' },
+          ],
+        },
+        {
+          id: 'lc-s9-05',
+          enunciado: 'Evalúa el uso de conectores lógicos, marcadores discursivos y mecanismos de cohesión en la construcción de textos.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s9-05-e1', enunciado: 'Identifica conectores de causa, consecuencia, condición, contraste y adición en textos argumentativos.' },
+            { id: 'lc-s9-05-e2', enunciado: 'Evalúa si la selección de conectores es adecuada para mantener la coherencia del texto.' },
+          ],
+        },
+        {
+          id: 'lc-s9-06',
+          enunciado: 'Reconoce las características formales de diferentes tipologías textuales y sus variantes.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s9-06-e1', enunciado: 'Diferencia entre textos narrativos, expositivos, argumentativos, descriptivos e instructivos por sus rasgos formales.' },
+            { id: 'lc-s9-06-e2', enunciado: 'Identifica variantes dentro de una tipología (crónica, editorial, ensayo, reseña).' },
+          ],
+        },
+        {
+          id: 'lc-s9-07',
+          enunciado: 'Identifica la función de elementos paratextuales (títulos, subtítulos, epígrafes, notas al pie, imágenes) en la comprensión del texto.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s9-07-e1', enunciado: 'Establece la relación entre el título o subtítulo y el contenido del texto.' },
+            { id: 'lc-s9-07-e2', enunciado: 'Reconoce cómo las imágenes, tablas o notas al pie complementan la información del texto.' },
+          ],
+        },
+        // --- Pragmático ---
+        {
+          id: 'lc-s9-08',
+          enunciado: 'Evalúa la intención comunicativa del autor y los recursos persuasivos utilizados.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s9-08-e1', enunciado: 'Identifica las estrategias argumentativas que usa el autor para persuadir al lector.' },
+            { id: 'lc-s9-08-e2', enunciado: 'Distingue entre la información objetiva y la valoración subjetiva del autor.' },
+            { id: 'lc-s9-08-e3', enunciado: 'Reconoce el tono del texto (irónico, crítico, informativo, persuasivo).' },
+          ],
+        },
+        {
+          id: 'lc-s9-09',
+          enunciado: 'Asume una posición crítica frente a lo leído y la sustenta con argumentos del texto y de su conocimiento previo.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s9-09-e1', enunciado: 'Formula una opinión sobre el contenido del texto y la sustenta con evidencias textuales.' },
+            { id: 'lc-s9-09-e2', enunciado: 'Compara su punto de vista con el del autor identificando coincidencias y divergencias.' },
+          ],
+        },
+        {
+          id: 'lc-s9-10',
+          enunciado: 'Establece relaciones intertextuales entre diferentes textos y los contextualiza social y culturalmente.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s9-10-e1', enunciado: 'Compara la perspectiva de dos o más textos sobre un mismo tema.' },
+            { id: 'lc-s9-10-e2', enunciado: 'Relaciona el contenido de un texto con el contexto histórico, social o cultural en el que fue producido.' },
+          ],
+        },
+      ],
+
+      niveles: [
+        {
+          nombre: 'Insuficiente',
+          rango: [100, 226],
+          color: '#EF4444',
+          descripcion: 'El estudiante no supera las preguntas de menor complejidad de la prueba. No extrae información puntual de textos de complejidad media ni reconoce la estructura básica de textos argumentativos.',
+          aprendizajesEsperados: [],
+        },
+        {
+          nombre: 'Mínimo',
+          rango: [226, 310],
+          color: '#F59E0B',
+          descripcion: 'El estudiante extrae información explícita de textos de complejidad media, identifica la estructura básica de textos argumentativos y diferencia tipologías textuales por sus rasgos formales.',
+          aprendizajesEsperados: ['lc-s9-01', 'lc-s9-04', 'lc-s9-06'],
+        },
+        {
+          nombre: 'Satisfactorio',
+          rango: [310, 406],
+          color: '#10B981',
+          descripcion: 'El estudiante construye el sentido global del texto relacionando proposiciones, analiza figuras retóricas, evalúa el uso de conectores y reconoce la intención comunicativa del autor y sus recursos persuasivos.',
+          aprendizajesEsperados: ['lc-s9-01', 'lc-s9-02', 'lc-s9-03', 'lc-s9-04', 'lc-s9-05', 'lc-s9-06', 'lc-s9-08'],
+        },
+        {
+          nombre: 'Avanzado',
+          rango: [406, 500],
+          color: '#3B82F6',
+          descripcion: 'El estudiante identifica la función de elementos paratextuales, asume una posición crítica sustentada con evidencias textuales, y establece relaciones intertextuales contextualizando los textos social y culturalmente.',
+          aprendizajesEsperados: ['lc-s9-01', 'lc-s9-02', 'lc-s9-03', 'lc-s9-04', 'lc-s9-05', 'lc-s9-06', 'lc-s9-07', 'lc-s9-08', 'lc-s9-09', 'lc-s9-10'],
+        },
+      ],
+    },
+
+    // =========================================================
+    // SABER 11°
+    // =========================================================
+    'saber-11': {
+      nombre: 'Saber 11°',
+      grados: ['10', '11'],
+
+      aprendizajes: [
+        // --- Semántico ---
+        {
+          id: 'lc-s11-01',
+          enunciado: 'Identifica y entiende los contenidos locales que conforman un texto: significados de palabras, expresiones y proposiciones, e información explícita e implícita.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s11-01-e1', enunciado: 'Comprende el significado de palabras y expresiones de uso especializado en contextos académicos.' },
+            { id: 'lc-s11-01-e2', enunciado: 'Identifica información explícita e implícita en textos de alta complejidad.' },
+            { id: 'lc-s11-01-e3', enunciado: 'Distingue entre el sentido literal y el sentido figurado de expresiones en contextos diversos.' },
+          ],
+        },
+        {
+          id: 'lc-s11-02',
+          enunciado: 'Establece relaciones semánticas entre enunciados, párrafos y secciones para construir el sentido global de textos filosóficos, científicos, periodísticos y literarios.',
+          competencia: 'comprender',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s11-02-e1', enunciado: 'Sintetiza el contenido de un texto complejo identificando las ideas principales y sus relaciones.' },
+            { id: 'lc-s11-02-e2', enunciado: 'Relaciona proposiciones de diferentes partes del texto para construir una interpretación coherente.' },
+          ],
+        },
+        {
+          id: 'lc-s11-03',
+          enunciado: 'Interpreta textos que involucran múltiples sistemas simbólicos (textos discontinuos: gráficas, tablas, esquemas, infografías) y los relaciona con textos continuos.',
+          competencia: 'identificar',
+          componente: 'semantico',
+          evidencias: [
+            { id: 'lc-s11-03-e1', enunciado: 'Extrae información de gráficas, tablas estadísticas e infografías y la relaciona con el texto escrito.' },
+            { id: 'lc-s11-03-e2', enunciado: 'Traduce información presentada en un formato a otro (de tabla a texto, de gráfica a proposición).' },
+          ],
+        },
+        // --- Sintáctico ---
+        {
+          id: 'lc-s11-04',
+          enunciado: 'Comprende cómo se articulan las partes de un texto para darle un sentido global: estructura, coherencia y cohesión.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s11-04-e1', enunciado: 'Identifica la tesis central y los argumentos de apoyo en textos argumentativos complejos.' },
+            { id: 'lc-s11-04-e2', enunciado: 'Evalúa la organización de un texto y la progresión temática.' },
+            { id: 'lc-s11-04-e3', enunciado: 'Reconoce la función de los párrafos en la estructura global del texto.' },
+          ],
+        },
+        {
+          id: 'lc-s11-05',
+          enunciado: 'Analiza las estrategias discursivas de textos argumentativos de alta complejidad (ensayo, artículo de opinión, editorial, texto filosófico).',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s11-05-e1', enunciado: 'Identifica falacias argumentativas, generalizaciones indebidas y razonamientos circulares.' },
+            { id: 'lc-s11-05-e2', enunciado: 'Reconoce las estrategias retóricas del autor (ejemplificación, analogía, contraargumentación, apelación a la autoridad).' },
+          ],
+        },
+        {
+          id: 'lc-s11-06',
+          enunciado: 'Reconoce las características del discurso académico y científico y lo diferencia de otros tipos de discurso.',
+          competencia: 'comprender',
+          componente: 'sintactico',
+          evidencias: [
+            { id: 'lc-s11-06-e1', enunciado: 'Identifica marcas del discurso académico (citaciones, referencias, lenguaje técnico, registro formal).' },
+            { id: 'lc-s11-06-e2', enunciado: 'Diferencia entre afirmaciones verificables empíricamente y valoraciones subjetivas.' },
+          ],
+        },
+        // --- Pragmático ---
+        {
+          id: 'lc-s11-07',
+          enunciado: 'Reflexiona a partir de un texto y evalúa su contenido: valida o cuestiona los planteamientos del autor con argumentos propios o de otras fuentes.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s11-07-e1', enunciado: 'Evalúa la validez de los argumentos del autor usando evidencia del texto y conocimiento externo.' },
+            { id: 'lc-s11-07-e2', enunciado: 'Identifica los supuestos e implicaciones de las afirmaciones del autor.' },
+            { id: 'lc-s11-07-e3', enunciado: 'Formula contraargumentos razonados frente a las posiciones del texto.' },
+          ],
+        },
+        {
+          id: 'lc-s11-08',
+          enunciado: 'Evalúa la forma de un texto: reconoce las estrategias del autor y su eficacia comunicativa.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s11-08-e1', enunciado: 'Evalúa si las estrategias argumentativas del autor son efectivas para su propósito.' },
+            { id: 'lc-s11-08-e2', enunciado: 'Analiza cómo el tono, el registro y la selección léxica contribuyen al efecto deseado.' },
+          ],
+        },
+        {
+          id: 'lc-s11-09',
+          enunciado: 'Contextualiza textos en su marco social, histórico, cultural e ideológico y reconoce cómo estos factores condicionan el sentido.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s11-09-e1', enunciado: 'Relaciona el contenido de un texto con el contexto histórico y cultural de su producción.' },
+            { id: 'lc-s11-09-e2', enunciado: 'Reconoce los presupuestos ideológicos o culturales que subyacen a un texto.' },
+          ],
+        },
+        {
+          id: 'lc-s11-10',
+          enunciado: 'Establece relaciones intertextuales entre textos de diferentes épocas, géneros y tradiciones, e identifica influencias y diálogos entre ellos.',
+          competencia: 'reflexionar',
+          componente: 'pragmatico',
+          evidencias: [
+            { id: 'lc-s11-10-e1', enunciado: 'Compara perspectivas de diferentes autores sobre un mismo tema o problema.' },
+            { id: 'lc-s11-10-e2', enunciado: 'Reconoce cómo un texto alude, cita o transforma ideas de otros textos.' },
+          ],
+        },
+      ],
+
+      niveles: [
+        {
+          nombre: 'Insuficiente',
+          rango: [0, 36],
+          color: '#EF4444',
+          descripcion: 'El estudiante no supera las preguntas de menor complejidad de la prueba. No identifica información explícita en textos de alta complejidad ni reconoce la estructura básica de textos argumentativos complejos.',
+          aprendizajesEsperados: [],
+        },
+        {
+          nombre: 'Mínimo',
+          rango: [36, 51],
+          color: '#F59E0B',
+          descripcion: 'El estudiante identifica información explícita e implícita en textos de alta complejidad, interpreta textos discontinuos (gráficas, tablas) y reconoce la tesis y los argumentos en textos argumentativos.',
+          aprendizajesEsperados: ['lc-s11-01', 'lc-s11-03', 'lc-s11-04'],
+        },
+        {
+          nombre: 'Satisfactorio',
+          rango: [51, 71],
+          color: '#10B981',
+          descripcion: 'El estudiante construye el sentido global de textos complejos relacionando sus partes, analiza estrategias discursivas argumentativas, y reflexiona sobre el contenido evaluando la validez de los planteamientos del autor.',
+          aprendizajesEsperados: ['lc-s11-01', 'lc-s11-02', 'lc-s11-03', 'lc-s11-04', 'lc-s11-05', 'lc-s11-07'],
+        },
+        {
+          nombre: 'Avanzado',
+          rango: [71, 100],
+          color: '#3B82F6',
+          descripcion: 'El estudiante diferencia el discurso académico de otros tipos de discurso, evalúa la eficacia comunicativa del autor, contextualiza textos en su marco ideológico y cultural, y establece relaciones intertextuales entre textos de diferentes épocas y tradiciones.',
+          aprendizajesEsperados: ['lc-s11-01', 'lc-s11-02', 'lc-s11-03', 'lc-s11-04', 'lc-s11-05', 'lc-s11-06', 'lc-s11-07', 'lc-s11-08', 'lc-s11-09', 'lc-s11-10'],
+        },
+      ],
+    },
+  },
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { ICFES_LECTURA_CRITICA }
+}
 
 // filtros.js — Lógica de filtrado cascading: ciclo → grados → área → eje
 // No depende de IA. Funciona 100% offline.
@@ -6004,8 +7370,9 @@ function buscarDBA(query, filtroArea) {
 function buscarTodo(query, filtroArea) {
   const estandares = buscarEstandares(query, filtroArea);
   const dbas = buscarDBA(query, filtroArea);
+  const icfes = typeof buscarICFES === 'function' ? buscarICFES(query, filtroArea) : [];
 
-  return [...estandares, ...dbas].sort((a, b) => b.relevancia - a.relevancia);
+  return [...estandares, ...dbas, ...icfes].sort((a, b) => b.relevancia - a.relevancia);
 }
 // exportacion.js — Exportación: PDF (print), JSON, CSV
 
@@ -6092,7 +7459,7 @@ function prepararDatosExportacion(vista) {
       };
     case 'estandares':
       return {
-        titulo: `EBC - ${AREAS_EBC[vista.area]?.nombre} - Grupo ${vista.grupo}`,
+        titulo: `Estándares - ${AREAS_EBC[vista.area]?.nombre} - Grupo ${vista.grupo}`,
         area: vista.area,
         grupo: vista.grupo,
         estandarGeneral: getEstandarGeneral(vista.area, vista.grupo),
@@ -6280,11 +7647,194 @@ const Storage = {
     keys.forEach(k => localStorage.removeItem(k));
   }
 };
+// icfes.js — Acceso y articulación de datos ICFES (Saber 3°, 5°, 9°, 11°)
+// Depende de: ICFES_MATEMATICAS, EBC_MATEMATICAS, DBA, GRUPOS_EBC_ORDEN, gradoAGrupoEBC(), normalizarTexto()
+
+// Mapa de grados a prueba ICFES
+const GRADO_A_PRUEBA = {
+  '1': 'saber-3', '2': 'saber-3', '3': 'saber-3',
+  '4': 'saber-5', '5': 'saber-5',
+  '6': 'saber-9', '7': 'saber-9', '8': 'saber-9', '9': 'saber-9',
+  '10': 'saber-11', '11': 'saber-11'
+};
+
+// Retorna el objeto ICFES completo para un área
+function getICFESData(area) {
+  if (area === 'matematicas') {
+    return typeof ICFES_MATEMATICAS !== 'undefined' ? ICFES_MATEMATICAS : null;
+  }
+  if (area === 'lenguaje') {
+    return typeof ICFES_LECTURA_CRITICA !== 'undefined' ? ICFES_LECTURA_CRITICA : null;
+  }
+  // Preparado para expandir: 'ciencias-naturales', 'ciencias-sociales'
+  return null;
+}
+
+// Retorna array de pruebas disponibles: [{ id, nombre }, ...]
+function getPruebasICFES(area) {
+  const data = getICFESData(area);
+  if (!data) return [];
+  return Object.entries(data.pruebas).map(([id, prueba]) => ({
+    id,
+    nombre: prueba.nombre
+  }));
+}
+
+// Dado un grado (string), retorna el id de la prueba ICFES correspondiente
+function getPruebaParaGrado(grado) {
+  return GRADO_A_PRUEBA[String(grado)] || null;
+}
+
+// Retorna aprendizajes filtrados de una prueba
+// competencia y componente son opcionales
+function getAprendizajesICFES(area, pruebaId, competencia, componente) {
+  const data = getICFESData(area);
+  if (!data || !data.pruebas[pruebaId]) return [];
+
+  let aprendizajes = data.pruebas[pruebaId].aprendizajes || [];
+
+  if (competencia) {
+    aprendizajes = aprendizajes.filter(a => a.competencia === competencia);
+  }
+  if (componente) {
+    aprendizajes = aprendizajes.filter(a => a.componente === componente);
+  }
+
+  return aprendizajes;
+}
+
+// Retorna las evidencias de un aprendizaje específico
+function getEvidenciasICFES(area, pruebaId, aprendizajeId) {
+  const data = getICFESData(area);
+  if (!data || !data.pruebas[pruebaId]) return [];
+
+  const aprendizaje = data.pruebas[pruebaId].aprendizajes.find(
+    a => a.id === aprendizajeId
+  );
+
+  return aprendizaje?.evidencias || [];
+}
+
+// Retorna los niveles de desempeño de una prueba
+function getNivelesDesempeno(area, pruebaId) {
+  const data = getICFESData(area);
+  if (!data || !data.pruebas[pruebaId]) return [];
+  return data.pruebas[pruebaId].niveles || [];
+}
+
+// Dado un puntaje numérico, retorna el nivel de desempeño correspondiente
+function getNivelPorPuntaje(area, pruebaId, puntaje) {
+  const niveles = getNivelesDesempeno(area, pruebaId);
+  return niveles.find(nivel => {
+    const [min, max] = nivel.rango;
+    return puntaje >= min && puntaje < max;
+  }) || null;
+}
+
+// Articula estándares EBC con aprendizajes ICFES para un grupo de grados
+// Retorna los datos agrupados para que la UI los muestre juntos (sin matching automático)
+function articularEBCconICFES(area, grupoEBC) {
+  const data = getICFESData(area);
+  if (!data) return null;
+
+  // Determina la prueba según el primer grado del grupo
+  const primerGrado = grupoEBC.split('-')[0];
+  const pruebaId = getPruebaParaGrado(primerGrado);
+  if (!pruebaId || !data.pruebas[pruebaId]) return null;
+
+  const prueba = data.pruebas[pruebaId];
+
+  // Estándares EBC del grupo
+  const estandaresGrupo = getEstandares(area, grupoEBC);
+
+  return {
+    grupoEBC,
+    pruebaICFES: { id: pruebaId, nombre: prueba.nombre, grados: prueba.grados },
+    aprendizajes: prueba.aprendizajes || [],
+    componentes: data.componentes || [],
+    competencias: data.competencias || [],
+    estandaresEBC: estandaresGrupo
+  };
+}
+
+// Retorna las competencias ICFES del área
+function getCompetenciasICFES(area) {
+  const data = getICFESData(area);
+  return data?.competencias || [];
+}
+
+// Retorna los componentes ICFES del área
+function getComponentesICFES(area) {
+  const data = getICFESData(area);
+  return data?.componentes || [];
+}
+
+// Búsqueda full-text en aprendizajes y evidencias ICFES
+// Sigue el patrón de buscarEstandares() y buscarDBA()
+function buscarICFES(query, filtroArea) {
+  const queryNorm = normalizarTexto(query);
+  if (!queryNorm || queryNorm.length < 2) return [];
+
+  const palabras = queryNorm.split(' ').filter(p => p.length > 1);
+  const resultados = [];
+
+  const areas = filtroArea ? [filtroArea] : ['matematicas'];
+
+  for (const area of areas) {
+    const data = getICFESData(area);
+    if (!data) continue;
+
+    for (const [pruebaId, prueba] of Object.entries(data.pruebas)) {
+      const aprendizajes = prueba.aprendizajes || [];
+
+      for (const aprendizaje of aprendizajes) {
+        // Buscar en el enunciado del aprendizaje
+        const textoNorm = normalizarTexto(aprendizaje.enunciado);
+        const coincidencias = palabras.filter(p => textoNorm.includes(p)).length;
+
+        if (coincidencias > 0) {
+          resultados.push({
+            tipo: 'aprendizaje-icfes',
+            area,
+            prueba: pruebaId,
+            id: aprendizaje.id,
+            texto: aprendizaje.enunciado,
+            competencia: aprendizaje.competencia,
+            componente: aprendizaje.componente,
+            relevancia: coincidencias / palabras.length
+          });
+        }
+
+        // Buscar en cada evidencia del aprendizaje
+        for (const evidencia of (aprendizaje.evidencias || [])) {
+          const evNorm = normalizarTexto(evidencia.enunciado);
+          const evCoincidencias = palabras.filter(p => evNorm.includes(p)).length;
+
+          if (evCoincidencias > 0) {
+            resultados.push({
+              tipo: 'evidencia-icfes',
+              area,
+              prueba: pruebaId,
+              id: evidencia.id,
+              aprendizajeId: aprendizaje.id,
+              texto: evidencia.enunciado,
+              competencia: aprendizaje.competencia,
+              componente: aprendizaje.componente,
+              relevancia: evCoincidencias / palabras.length
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return resultados.sort((a, b) => b.relevancia - a.relevancia);
+}
 
 // connector.js — Conexión con Gemini API (free tier) + fallback "Abrir en Gemini"
 
 const IA = {
-  modelo: 'gemini-2.0-flash',
+  modelo: 'gemini-2.5-flash-lite',
   maxOutputTokens: 600,
   temperature: 0.7,
   urlBase: 'https://generativelanguage.googleapis.com/v1beta/models/',
@@ -6372,7 +7922,7 @@ const IA = {
     return { metodo: 'url', mensaje: 'Abriendo Gemini con el prompt...' };
   },
 
-  // Verificar si la API key funciona
+  // Verificar si la API key funciona — retorna { ok, mensaje }
   async verificarApiKey(apiKey) {
     try {
       const url = `${this.urlBase}${this.modelo}:generateContent?key=${apiKey}`;
@@ -6384,9 +7934,11 @@ const IA = {
           generationConfig: { maxOutputTokens: 10 }
         })
       });
-      return response.ok;
-    } catch {
-      return false;
+      if (response.ok) return { ok: true, mensaje: 'API key válida' };
+      const err = await response.json().catch(() => ({}));
+      return { ok: false, mensaje: err.error?.message || `Error ${response.status}` };
+    } catch (e) {
+      return { ok: false, mensaje: e.message || 'Error de conexión' };
     }
   }
 };
@@ -6500,7 +8052,7 @@ async function ejecutarIA(tipo, vistaActual, datosAdicionales = {}) {
     abrirEnGemini: () => IA.abrirEnGemini(prompt)
   };
 }
-// app.js — Articulador Curricular EBC - Main Application
+// app.js — Articulador Curricular Saber ICFES - Main Application
 // Router hash + rendering + event handlers
 
 const EJE_SHORT_LABELS = {
@@ -6706,13 +8258,18 @@ const App = {
       return;
     }
 
-    results.innerHTML = items.slice(0, 8).map(item => `
-      <div class="search-result-item" data-action="navigate" data-value="#/area/${item.area}/${item.grupo || gradoAGrupoEBC(item.grado)}">
-        <span class="search-result-type">${item.tipo.toUpperCase()} · ${AREAS_EBC[item.area]?.nombre || item.area}</span>
-        <div class="search-result-text">${highlightText(item.texto, query)}</div>
-        <span class="badge badge-muted">${item.grupo || 'Grado ' + item.grado}</span>
-      </div>
-    `).join('');
+    const pruebaAGrupo = { 'saber-3': '1-3', 'saber-5': '4-5', 'saber-9': '8-9', 'saber-11': '10-11' };
+    results.innerHTML = items.slice(0, 8).map(item => {
+      const grupoNav = item.grupo || (item.prueba ? pruebaAGrupo[item.prueba] : null) || gradoAGrupoEBC(item.grado || '8');
+      const grupoLabel = item.grupo || (item.prueba ? pruebaAGrupo[item.prueba] : null) || ('Grado ' + item.grado);
+      return `
+        <div class="search-result-item" data-action="navigate" data-value="#/area/${item.area}/${grupoNav}">
+          <span class="search-result-type">${item.tipo.toUpperCase()} · ${AREAS_EBC[item.area]?.nombre || item.area}</span>
+          <div class="search-result-text">${highlightText(item.texto, query)}</div>
+          <span class="badge badge-muted">${grupoLabel}</span>
+        </div>
+      `;
+    }).join('');
     results.style.display = 'block';
   },
 
@@ -6809,14 +8366,14 @@ const App = {
     const inst = Storage.getInstitucion();
     return `
       <div class="print-header">
-        <div class="print-header-title">Articulador Curricular EBC</div>
+        <div class="print-header-title">Articulador Curricular Saber ICFES</div>
         <div class="print-header-subtitle">${inst.nombre || 'MEN Colombia'} · ${new Date().getFullYear()}</div>
       </div>
 
-      <h1 class="section-title">Diseño Curricular con EBC</h1>
+      <h1 class="section-title">Diseño Curricular Saber ICFES</h1>
       <p class="section-description">
-        Navegue los Estándares Básicos de Competencias del MEN, analice la progresión vertical entre grados
-        y genere articulaciones curriculares personalizadas. Seleccione un área para comenzar.
+        Navegue los Estándares Básicos de Competencias, DBA y aprendizajes ICFES alineados a las pruebas Saber.
+        Analice la progresión vertical entre grados y genere articulaciones curriculares. Seleccione un área para comenzar.
       </p>
 
       <div class="areas-grid">
@@ -6913,8 +8470,8 @@ const App = {
 
     return `
       <div class="print-header">
-        <div class="print-header-title">${info?.nombre || area} — EBC Grupo ${grupo}</div>
-        <div class="print-header-subtitle">Articulador Curricular EBC · MEN Colombia</div>
+        <div class="print-header-title">${info?.nombre || area} — Grupo ${grupo}</div>
+        <div class="print-header-subtitle">Articulador Curricular Saber ICFES · MEN Colombia</div>
       </div>
 
       <div class="flex items-center justify-between" style="flex-wrap:wrap; gap:var(--sp-3)">
@@ -6962,6 +8519,9 @@ const App = {
 
       <!-- DBA del grupo -->
       ${this.renderDBAGrupo(area, grupo)}
+
+      <!-- ICFES: Aprendizajes, Evidencias y Niveles -->
+      ${this.renderICFESSection(area, grupo, eje)}
 
       <!-- Panel IA -->
       ${this.renderIAPanel()}
@@ -7084,6 +8644,123 @@ const App = {
     `;
   },
 
+  // === ICFES SECTION ===
+  renderICFESSection(area, grupo, ejeFiltro) {
+    if (typeof articularEBCconICFES !== 'function') return '';
+    const articulacion = articularEBCconICFES(area, grupo);
+    if (!articulacion) return '';
+
+    const { pruebaICFES, aprendizajes, competencias, componentes } = articulacion;
+    const niveles = getNivelesDesempeno(area, pruebaICFES.id);
+
+    // Mapeo eje EBC → componente ICFES (Matemáticas)
+    // Mapeo eje EBC → componente ICFES por área
+    const EJE_A_COMPONENTE = {
+      // Matemáticas
+      'numerico': 'numerico-variacional',
+      'variacional': 'numerico-variacional',
+      'espacial': 'geometrico-metrico',
+      'metrico': 'geometrico-metrico',
+      'aleatorio': 'aleatorio',
+      // Lenguaje
+      'comprension': 'semantico',
+      'literatura': 'semantico',
+      'produccion': 'sintactico',
+      'medios': 'pragmatico',
+      'etica': 'pragmatico'
+    };
+    const componenteFiltro = ejeFiltro ? EJE_A_COMPONENTE[ejeFiltro] : null;
+    const componentesFiltrados = componenteFiltro
+      ? componentes.filter(c => c.id === componenteFiltro)
+      : componentes;
+
+    // Agrupar aprendizajes por componente
+    const porComponente = {};
+    for (const comp of componentesFiltrados) {
+      porComponente[comp.id] = aprendizajes.filter(a => a.componente === comp.id);
+    }
+
+    const totalAprendizajes = Object.values(porComponente).reduce((s, a) => s + a.length, 0);
+    const filtroLabel = componenteFiltro
+      ? componentesFiltrados[0]?.nombre || ''
+      : 'todos los componentes';
+
+    return `
+      <h2 class="section-title mt-4">ICFES — ${pruebaICFES.nombre}</h2>
+      <p class="section-description">
+        ${componenteFiltro
+          ? `Aprendizajes del componente <strong>${filtroLabel}</strong> (filtrado por eje seleccionado). <a href="#/area/${area}/${grupo}" class="text-accent" style="text-decoration:underline">Ver todos</a>`
+          : 'Aprendizajes evaluados, evidencias y niveles de desempeño según el marco de referencia ICFES para este grupo de grados.'}
+      </p>
+
+      <!-- Competencias y componentes -->
+      <div class="flex gap-2 mb-4" style="flex-wrap:wrap">
+        ${competencias.map(c => `<span class="badge badge-accent">${c.nombre}</span>`).join('')}
+        <span class="text-muted">·</span>
+        ${componentes.map(c => `<span class="badge ${componenteFiltro && c.id === componenteFiltro ? 'badge-accent' : 'badge-muted'}">${c.nombre}</span>`).join('')}
+      </div>
+
+      <!-- Aprendizajes por componente -->
+      ${componentesFiltrados.map(comp => {
+        const aprends = porComponente[comp.id] || [];
+        if (!aprends.length) return '';
+        return `
+          <div class="card card-accent mt-3">
+            <div class="card-header">
+              <span class="card-title">${comp.nombre}</span>
+              <span class="badge badge-muted">${aprends.length} aprendizajes</span>
+            </div>
+            <div class="card-body">
+              ${aprends.map(a => `
+                <details class="icfes-aprendizaje">
+                  <summary class="estandar-item" style="cursor:pointer; list-style:none">
+                    <div class="flex items-center gap-2" style="flex-wrap:wrap">
+                      <span class="badge badge-accent" style="font-size:0.65rem">${a.competencia}</span>
+                      <span>${a.enunciado}</span>
+                    </div>
+                  </summary>
+                  <div class="icfes-evidencias">
+                    ${a.evidencias.map(e => `
+                      <div class="icfes-evidencia-item">
+                        <span class="text-muted text-xs">${e.id}</span> ${e.enunciado}
+                      </div>
+                    `).join('')}
+                  </div>
+                </details>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('')}
+
+      <!-- Niveles de desempeño -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <span class="card-title">Niveles de Desempeño — ${pruebaICFES.nombre}</span>
+        </div>
+        <div class="card-body">
+          <div class="icfes-niveles-grid">
+            ${niveles.map(nivel => `
+              <div class="icfes-nivel" style="border-left: 4px solid ${nivel.color}">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="icfes-nivel-dot" style="background:${nivel.color}"></span>
+                  <strong>${nivel.nombre}</strong>
+                  <span class="text-muted text-xs">(${nivel.rango[0]}–${nivel.rango[1]})</span>
+                </div>
+                <p class="text-sm text-secondary" style="line-height:var(--leading-loose)">${nivel.descripcion}</p>
+                ${nivel.aprendizajesEsperados.length > 0 ? `
+                  <div class="flex gap-1 mt-2" style="flex-wrap:wrap">
+                    ${nivel.aprendizajesEsperados.map(id => `<span class="badge badge-muted" style="font-size:0.6rem">${id}</span>`).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
   // === VIEW: PLAN DE PERIODO ===
   renderPlan() {
     const grado = this.state.grado || '8';
@@ -7105,7 +8782,7 @@ const App = {
     return `
       <div class="print-header">
         <div class="print-header-title">Plan de Periodo — Matemáticas ${grado}° · Periodo ${periodo}</div>
-        <div class="print-header-subtitle">${Storage.getInstitucion().nombre || 'Articulador Curricular EBC'}</div>
+        <div class="print-header-subtitle">${Storage.getInstitucion().nombre || 'Articulador Curricular Saber ICFES'}</div>
       </div>
 
       <div class="flex items-center justify-between" style="flex-wrap:wrap; gap:var(--sp-3)">
@@ -7269,6 +8946,12 @@ const App = {
         </div>
       </div>
 
+      <!-- Articulación ICFES: Aprendizajes resueltos + Nivel de Desempeño -->
+      ${this.renderPlanICFES(grado, plan)}
+
+      <!-- Progresión Vertical compacta -->
+      ${this.renderPlanProgresion(grado, plan)}
+
       <!-- Panel IA -->
       ${this.renderIAPanel()}
 
@@ -7276,6 +8959,146 @@ const App = {
       <div class="flex justify-between mt-4">
         ${parseInt(grado) > 8 ? `<button class="btn btn-ghost" data-action="navigate" data-value="#/plan/${parseInt(grado)-1}/${periodo}">← Grado ${parseInt(grado)-1}°</button>` : '<span></span>'}
         ${parseInt(grado) < 11 ? `<button class="btn btn-ghost" data-action="navigate" data-value="#/plan/${parseInt(grado)+1}/${periodo}">Grado ${parseInt(grado)+1}° →</button>` : '<span></span>'}
+      </div>
+    `;
+  },
+
+  // === PLAN: ICFES Aprendizajes resueltos + Nivel de Desempeño ===
+  renderPlanICFES(grado, plan) {
+    if (typeof getAprendizajesICFES !== 'function') return '';
+    if (!plan.aprendizajesICFES || !plan.aprendizajesICFES.length) return '';
+
+    const pruebaId = getPruebaParaGrado(grado);
+    if (!pruebaId) return '';
+
+    const todosAprendizajes = getAprendizajesICFES('matematicas', pruebaId);
+    const aprendizajesResueltos = plan.aprendizajesICFES
+      .map(id => todosAprendizajes.find(a => a.id === id))
+      .filter(Boolean);
+
+    if (!aprendizajesResueltos.length) return '';
+
+    // Nivel de desempeño
+    const niveles = getNivelesDesempeno('matematicas', pruebaId);
+    const nivelActivo = niveles.find(n => n.nombre === plan.nivelEsperado);
+
+    return `
+      <h2 class="section-title mt-4">Articulación ICFES — ${plan.nivelEsperado || ''}</h2>
+      <p class="section-description">Aprendizajes y evidencias ICFES vinculados a este periodo. Nivel de desempeño esperado al finalizar.</p>
+
+      <!-- Aprendizajes resueltos -->
+      <div class="card card-accent mt-3">
+        <div class="card-header">
+          <span class="card-title">Aprendizajes del Periodo</span>
+          <span class="badge badge-muted">${aprendizajesResueltos.length} aprendizajes</span>
+        </div>
+        <div class="card-body">
+          ${aprendizajesResueltos.map(a => `
+            <details class="icfes-aprendizaje">
+              <summary class="estandar-item" style="cursor:pointer; list-style:none">
+                <div class="flex items-center gap-2" style="flex-wrap:wrap">
+                  <span class="badge badge-accent" style="font-size:0.65rem">${a.competencia}</span>
+                  <span class="badge badge-muted" style="font-size:0.6rem">${a.componente}</span>
+                  <span>${a.enunciado}</span>
+                </div>
+              </summary>
+              <div class="icfes-evidencias">
+                ${(plan.evidenciasICFES || []).length > 0
+                  ? a.evidencias.filter(e => plan.evidenciasICFES.includes(e.id)).map(e => `
+                      <div class="icfes-evidencia-item">
+                        <span class="text-muted text-xs">${e.id}</span> ${e.enunciado}
+                      </div>
+                    `).join('') || a.evidencias.map(e => `
+                      <div class="icfes-evidencia-item">
+                        <span class="text-muted text-xs">${e.id}</span> ${e.enunciado}
+                      </div>
+                    `).join('')
+                  : a.evidencias.map(e => `
+                      <div class="icfes-evidencia-item">
+                        <span class="text-muted text-xs">${e.id}</span> ${e.enunciado}
+                      </div>
+                    `).join('')
+                }
+              </div>
+            </details>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Niveles de desempeño con activo destacado -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <span class="card-title">Nivel de Desempeño Esperado</span>
+          <span class="badge" style="background:${nivelActivo?.color || 'var(--muted)'}; color:white; font-size:0.7rem">${plan.nivelEsperado}</span>
+        </div>
+        <div class="card-body">
+          <div class="icfes-niveles-grid">
+            ${niveles.map(nivel => `
+              <div class="icfes-nivel ${nivel.nombre === plan.nivelEsperado ? 'icfes-nivel-activo' : 'icfes-nivel-inactivo'}" style="border-left: 4px solid ${nivel.color}">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="icfes-nivel-dot" style="background:${nivel.color}"></span>
+                  <strong>${nivel.nombre}</strong>
+                  <span class="text-muted text-xs">(${nivel.rango[0]}–${nivel.rango[1]})</span>
+                </div>
+                ${nivel.nombre === plan.nivelEsperado
+                  ? `<p class="text-sm text-secondary" style="line-height:var(--leading-loose)">${nivel.descripcion}</p>`
+                  : ''
+                }
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // === PLAN: Progresión Vertical compacta ===
+  renderPlanProgresion(grado, plan) {
+    if (typeof getLineaProgresion !== 'function') return '';
+    if (!plan.tiposPensamiento || !plan.tiposPensamiento.length) return '';
+
+    const TIPO_A_EJE = {
+      'Numérico': 'numerico', 'Espacial': 'espacial', 'Métrico': 'metrico',
+      'Aleatorio': 'aleatorio', 'Variacional': 'variacional'
+    };
+    const GRADO_A_GRUPO = { '8': '8-9', '9': '8-9', '10': '10-11', '11': '10-11' };
+
+    const ejeId = TIPO_A_EJE[plan.tiposPensamiento[0]];
+    if (!ejeId) return '';
+
+    const grupoActual = GRADO_A_GRUPO[String(grado)];
+    const linea = getLineaProgresion('matematicas', ejeId);
+    if (!linea.length) return '';
+
+    // Filtrar: grupo anterior, actual, siguiente
+    const idxActual = linea.findIndex(l => l.grupo === grupoActual);
+    if (idxActual < 0) return '';
+
+    const contexto = linea.slice(Math.max(0, idxActual - 1), idxActual + 2);
+
+    return `
+      <h2 class="section-title mt-4">Progresión Vertical — ${plan.tiposPensamiento[0]}</h2>
+      <p class="section-description">Cómo evoluciona este eje desde el grupo anterior hacia el siguiente.</p>
+
+      <div class="flex gap-3 mt-3" style="flex-wrap:wrap">
+        ${contexto.map(item => `
+          <div class="card ${item.grupo === grupoActual ? 'card-accent' : ''}" style="flex:1; min-width:200px">
+            <div class="card-header">
+              <span class="card-title">Grados ${item.grupo}</span>
+              ${item.grupo === grupoActual ? '<span class="badge badge-accent">Actual</span>' : ''}
+            </div>
+            <div class="card-body">
+              ${item.estandares.length > 0
+                ? item.estandares.map(e => `<p class="text-sm text-secondary mb-2" style="line-height:var(--leading-loose)">· ${e}</p>`).join('')
+                : '<p class="text-muted text-sm">Sin datos</p>'
+              }
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="flex justify-center mt-3">
+        <a href="#/area/matematicas/${grupoActual}/${ejeId}" class="btn btn-secondary btn-sm">Ver progresión completa K-11 →</a>
       </div>
     `;
   },
@@ -7330,7 +9153,7 @@ const App = {
             <button class="btn btn-primary" onclick="Storage.setApiKey(document.getElementById('cfg-apikey').value); App.showToast('API key guardada')">
               Guardar API Key
             </button>
-            <button class="btn btn-secondary" onclick="IA.verificarApiKey(document.getElementById('cfg-apikey').value).then(ok => App.showToast(ok ? 'API key válida' : 'API key inválida'))">
+            <button class="btn btn-secondary" onclick="IA.verificarApiKey(document.getElementById('cfg-apikey').value).then(r => App.showToast(r.ok ? r.mensaje : 'Error: ' + r.mensaje))">
               Verificar
             </button>
           </div>
@@ -7356,7 +9179,7 @@ const App = {
 
     return `
       <h1 class="section-title">Búsqueda</h1>
-      <p class="section-description">Busque estándares EBC, DBA y contenidos en todas las áreas.</p>
+      <p class="section-description">Busque estándares EBC, DBA, aprendizajes ICFES y contenidos en todas las áreas.</p>
 
       <div class="search-container">
         <span class="search-icon">🔍</span>
@@ -7365,18 +9188,25 @@ const App = {
 
       ${resultados.length > 0 ? `
         <p class="text-sm text-muted mt-4">${resultados.length} resultado${resultados.length > 1 ? 's' : ''}</p>
-        ${resultados.slice(0, 20).map(r => `
-          <div class="card card-accent mt-2" data-action="navigate" data-value="#/area/${r.area}/${r.grupo || gradoAGrupoEBC(r.grado)}" style="cursor:pointer">
-            <div class="card-body">
-              <div class="flex gap-2 mb-2">
-                <span class="badge badge-${r.area === 'matematicas' ? 'mat' : r.area === 'lenguaje' ? 'len' : r.area === 'ciencias-naturales' ? 'nat' : 'soc'}">${AREAS_EBC[r.area]?.nombre || r.area}</span>
-                <span class="badge badge-muted">${r.tipo.toUpperCase()}</span>
-                <span class="badge badge-muted">${r.grupo || 'Grado ' + r.grado}</span>
+        ${(() => {
+          const _pag = { 'saber-3': '1-3', 'saber-5': '4-5', 'saber-9': '8-9', 'saber-11': '10-11' };
+          return resultados.slice(0, 20).map(r => {
+            const gNav = r.grupo || (r.prueba ? _pag[r.prueba] : null) || gradoAGrupoEBC(r.grado || '8');
+            const gLabel = r.grupo || (r.prueba ? _pag[r.prueba] : null) || ('Grado ' + r.grado);
+            return `
+              <div class="card card-accent mt-2" data-action="navigate" data-value="#/area/${r.area}/${gNav}" style="cursor:pointer">
+                <div class="card-body">
+                  <div class="flex gap-2 mb-2">
+                    <span class="badge badge-${r.area === 'matematicas' ? 'mat' : r.area === 'lenguaje' ? 'len' : r.area === 'ciencias-naturales' ? 'nat' : 'soc'}">${AREAS_EBC[r.area]?.nombre || r.area}</span>
+                    <span class="badge badge-muted">${r.tipo.toUpperCase()}</span>
+                    <span class="badge badge-muted">${gLabel}</span>
+                  </div>
+                  <p class="text-sm text-secondary">${r.texto}</p>
+                </div>
               </div>
-              <p class="text-sm text-secondary">${r.texto}</p>
-            </div>
-          </div>
-        `).join('')}
+            `;
+          }).join('');
+        })()}
       ` : query ? '<p class="text-muted mt-4">Sin resultados para "' + query + '"</p>' : ''}
     `;
   },
@@ -7404,7 +9234,7 @@ const App = {
             </div>
             <div class="ia-action-btn" data-action="ia-action" data-value="interdisciplinar">
               <div class="ia-action-btn-title">Conexión Interdisciplinar</div>
-              <div class="ia-action-btn-desc">Proyectos integradores entre dos áreas EBC</div>
+              <div class="ia-action-btn-desc">Proyectos integradores entre dos áreas curriculares</div>
             </div>
             <div class="ia-action-btn" data-action="ia-action" data-value="sugerenciaPedagogica">
               <div class="ia-action-btn-title">Sugerencia Pedagógica</div>
@@ -7449,7 +9279,7 @@ const App = {
         </li>
       </ul>
 
-      <div class="sidebar-label">Áreas EBC</div>
+      <div class="sidebar-label">Áreas Curriculares</div>
       <ul class="sidebar-nav">
         ${Object.entries(AREAS_EBC).map(([id, info]) => `
           <li class="sidebar-item ${this.state.area === id && this.state.vista === 'area' ? 'active' : ''}" data-action="navigate" data-value="#/area/${id}/${this.state.grupo || '8-9'}">

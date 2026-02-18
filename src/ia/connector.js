@@ -1,7 +1,7 @@
 // connector.js — Conexión con Gemini API (free tier) + fallback "Abrir en Gemini"
 
 const IA = {
-  modelo: 'gemini-2.0-flash',
+  modelo: 'gemini-2.5-flash-lite',
   maxOutputTokens: 600,
   temperature: 0.7,
   urlBase: 'https://generativelanguage.googleapis.com/v1beta/models/',
@@ -89,7 +89,7 @@ const IA = {
     return { metodo: 'url', mensaje: 'Abriendo Gemini con el prompt...' };
   },
 
-  // Verificar si la API key funciona
+  // Verificar si la API key funciona — retorna { ok, mensaje }
   async verificarApiKey(apiKey) {
     try {
       const url = `${this.urlBase}${this.modelo}:generateContent?key=${apiKey}`;
@@ -101,9 +101,11 @@ const IA = {
           generationConfig: { maxOutputTokens: 10 }
         })
       });
-      return response.ok;
-    } catch {
-      return false;
+      if (response.ok) return { ok: true, mensaje: 'API key válida' };
+      const err = await response.json().catch(() => ({}));
+      return { ok: false, mensaje: err.error?.message || `Error ${response.status}` };
+    } catch (e) {
+      return { ok: false, mensaje: e.message || 'Error de conexión' };
     }
   }
 };

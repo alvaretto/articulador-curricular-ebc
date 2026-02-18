@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Articulador Curricular EBC — MEN Colombia</title>
-  <meta name="description" content="Articulador de Estándares Básicos de Competencias del MEN Colombia. Navegue EBC, DBA y genere mallas curriculares articuladas.">
+  <title>Articulador Curricular Saber ICFES — MEN Colombia</title>
+  <meta name="description" content="Articulador curricular alineado a pruebas Saber ICFES. Navegue EBC, DBA, ICFES y genere mallas curriculares articuladas.">
   <meta name="theme-color" content="#0e1018">
   <link rel="stylesheet" href="src/ui/styles.css">
 </head>
@@ -16,9 +16,9 @@
     <header class="app-header">
       <div class="header-brand">
         <button class="btn btn-icon btn-ghost hidden" id="menu-btn" data-action="toggle-sidebar" style="display:none" aria-label="Menú">☰</button>
-        <div class="header-logo">EBC</div>
+        <div class="header-logo">ICFES</div>
         <div>
-          <div class="header-title">Articulador Curricular EBC</div>
+          <div class="header-title">Articulador Curricular Saber ICFES</div>
           <div class="header-subtitle">Asistente Pedagógico para el Docente Colombiano</div>
         </div>
       </div>
@@ -51,6 +51,8 @@
   <script src="src/data/dba.js"></script>
   <script src="src/data/planes-matematicas.js"></script>
   <script src="src/data/progresion-vertical.js"></script>
+  <script src="src/data/icfes-matematicas.js"></script>
+  <script src="src/data/icfes-lectura-critica.js"></script>
 
   <!-- ENGINE -->
   <script src="src/engine/filtros.js"></script>
@@ -58,6 +60,7 @@
   <script src="src/engine/busqueda.js"></script>
   <script src="src/engine/exportacion.js"></script>
   <script src="src/engine/almacenamiento.js"></script>
+  <script src="src/engine/icfes.js"></script>
 
   <!-- IA -->
   <script src="src/ia/connector.js"></script>
