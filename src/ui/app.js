@@ -680,7 +680,13 @@ const App = {
       // Ciencias Sociales
       'historico-cultural': 'conocimientos-sociales',
       'espacial-ambiental': 'conocimientos-sociales',
-      'etico-politico': 'multiperspectividad'
+      'etico-politico': 'multiperspectividad',
+      // Inglés
+      'escucha': 'pragmatico',
+      'lectura': 'lexical',
+      'escritura': 'gramatical',
+      'monologo': 'pragmatico',
+      'conversacion': 'pragmatico'
     };
     const componenteFiltro = ejeFiltro ? EJE_A_COMPONENTE[ejeFiltro] : null;
     const componentesFiltrados = componenteFiltro
@@ -1390,7 +1396,8 @@ const App = {
       { id: 'matematicas', nombre: 'Matematicas', icon: '📐' },
       { id: 'lenguaje',    nombre: 'Lectura Critica', icon: '📖' },
       { id: 'naturales',   nombre: 'Ciencias Naturales', icon: '🔬' },
-      { id: 'sociales',    nombre: 'Sociales y Ciudadanas', icon: '🏛' }
+      { id: 'sociales',    nombre: 'Sociales y Ciudadanas', icon: '🏛' },
+      { id: 'ingles',      nombre: 'Inglés', icon: '🌐' }
     ];
   },
 
@@ -1588,7 +1595,7 @@ const App = {
     const esUltima = actual + 1 >= totalPreguntas;
     const respActual = respuestas[actual];
 
-    const areaLabels = { matematicas: 'Matematicas', lenguaje: 'Lectura Critica', naturales: 'Ciencias Naturales', sociales: 'Sociales y Ciudadanas' };
+    const areaLabels = { matematicas: 'Matematicas', lenguaje: 'Lectura Critica', naturales: 'Ciencias Naturales', sociales: 'Sociales y Ciudadanas', ingles: 'Inglés' };
     const pruebaLabels = { 'saber-9': 'Saber 9°', 'saber-11': 'Saber 11°' };
 
     return `
@@ -1686,7 +1693,7 @@ const App = {
     const mmUsado = String(Math.floor(tiempoUsado / 60)).padStart(2, '0');
     const ssUsado = String(tiempoUsado % 60).padStart(2, '0');
 
-    const areaLabels = { matematicas: 'Matematicas', lenguaje: 'Lectura Critica', naturales: 'Ciencias Naturales', sociales: 'Sociales y Ciudadanas' };
+    const areaLabels = { matematicas: 'Matematicas', lenguaje: 'Lectura Critica', naturales: 'Ciencias Naturales', sociales: 'Sociales y Ciudadanas', ingles: 'Inglés' };
     const pruebaLabels = { 'saber-9': 'Saber 9°', 'saber-11': 'Saber 11°' };
 
     const scoreColor = porcentaje >= 70 ? 'var(--success)' : porcentaje >= 50 ? 'var(--warning)' : 'var(--danger)';

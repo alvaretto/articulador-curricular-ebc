@@ -23,6 +23,9 @@ function getICFESData(area) {
   if (area === 'sociales') {
     return typeof ICFES_SOCIALES !== 'undefined' ? ICFES_SOCIALES : null;
   }
+  if (area === 'ingles') {
+    return typeof ICFES_INGLES !== 'undefined' ? ICFES_INGLES : null;
+  }
   return null;
 }
 

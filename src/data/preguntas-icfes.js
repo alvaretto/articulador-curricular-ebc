@@ -730,6 +730,98 @@ const PREGUNTAS_ICFES = {
       },
     ],
   },
+  // ===========================================================
+  // INGLÉS
+  // ===========================================================
+  ingles: {
+
+    // ---------------------------------------------------------
+    // SABER 11°
+    // ---------------------------------------------------------
+    'saber-11': [
+
+      // 1. Comprensión de lectura — idea principal (comprension-lectura / lexical)
+      {
+        id: 'eng-s11-p01',
+        enunciado: 'Read the following text and answer the question.\n\n"Recycling is one of the most important habits we can adopt to protect the environment. When we recycle paper, glass, and plastic, we reduce the amount of waste that ends up in landfills. This simple action also saves energy and natural resources. However, recycling alone is not enough; we also need to reduce our consumption and reuse materials whenever possible."\n\nWhat is the main idea of the text?',
+        opciones: [
+          { letra: 'A', texto: 'Landfills are the biggest environmental problem in modern cities.' },
+          { letra: 'B', texto: 'Recycling paper, glass, and plastic is easy and fun.' },
+          { letra: 'C', texto: 'Recycling is important, but protecting the environment also requires reducing consumption and reusing materials.' },
+          { letra: 'D', texto: 'We should only focus on saving energy to protect the environment.' },
+        ],
+        clave: 'C',
+        justificacion: 'El texto afirma que reciclar es importante, pero añade que no es suficiente por sí solo: también es necesario reducir el consumo y reutilizar materiales. La opción A reduce el problema a los vertederos. La opción B trivializa el mensaje. La opción D ignora el reciclaje y la reutilización mencionados en el texto.',
+        competencia: 'comprension-lectura',
+        componente: 'lexical',
+      },
+
+      // 2. Uso de la lengua — tiempos verbales (uso-lengua / gramatical)
+      {
+        id: 'eng-s11-p02',
+        enunciado: 'Choose the option that correctly completes the sentence.\n\n"By the time we arrived at the station, the train ______ already ______."',
+        opciones: [
+          { letra: 'A', texto: 'had / left' },
+          { letra: 'B', texto: 'has / left' },
+          { letra: 'C', texto: 'was / leaving' },
+          { letra: 'D', texto: 'will have / left' },
+        ],
+        clave: 'A',
+        justificacion: 'La oración describe dos acciones pasadas: llegar a la estación y la salida del tren, que ocurrió antes de la llegada. En inglés, la acción anterior se expresa con el Past Perfect (had + participio pasado). La opción B usa Present Perfect, incorrecto para contexto pasado. La opción C usa Past Continuous, que no expresa anterioridad. La opción D usa Future Perfect, que no corresponde a contexto pasado.',
+        competencia: 'uso-lengua',
+        componente: 'gramatical',
+      },
+
+      // 3. Comprensión de lectura — vocabulario en contexto (comprension-lectura / lexical)
+      {
+        id: 'eng-s11-p03',
+        enunciado: 'Read the following sentence and answer the question.\n\n"The scientist\'s groundbreaking discovery changed the way we understand the human brain forever."\n\nWhat does the word "groundbreaking" mean in this context?',
+        opciones: [
+          { letra: 'A', texto: 'Dangerous and controversial.' },
+          { letra: 'B', texto: 'Revolutionary and highly significant.' },
+          { letra: 'C', texto: 'Related to digging in the ground.' },
+          { letra: 'D', texto: 'Old-fashioned and outdated.' },
+        ],
+        clave: 'B',
+        justificacion: '"Groundbreaking" en inglés significa innovador o revolucionario, es decir, algo que rompe con lo establecido y tiene gran importancia. El contexto lo confirma: el descubrimiento cambió para siempre la comprensión del cerebro humano. La opción A agrega connotación negativa que no está en el texto. La opción C interpreta la palabra de forma literal (relacionada con el suelo). La opción D es lo opuesto al significado correcto.',
+        competencia: 'comprension-lectura',
+        componente: 'lexical',
+      },
+
+      // 4. Uso de la lengua — pragmática y actos de habla (uso-lengua / pragmatico)
+      {
+        id: 'eng-s11-p04',
+        enunciado: 'Read the following dialogue.\n\nA: "I\'m really sorry I forgot your birthday. I feel terrible about it."\nB: "______"\n\nWhich response best fits the context?',
+        opciones: [
+          { letra: 'A', texto: '"Don\'t worry about it. It happens to everyone."' },
+          { letra: 'B', texto: '"Birthdays are very important to me."' },
+          { letra: 'C', texto: '"I have a lot of friends who forgot my birthday too."' },
+          { letra: 'D', texto: '"I will call you tomorrow to discuss this."' },
+        ],
+        clave: 'A',
+        justificacion: 'A expresa una disculpa sincera. La respuesta más pragmáticamente adecuada es aceptar la disculpa y minimizar el daño, lo que hace la opción A. La opción B solo menciona la importancia de los cumpleaños sin responder a la disculpa. La opción C desvía la conversación hacia otros. La opción D pospone una respuesta de manera innecesaria y no corresponde al contexto emocional.',
+        competencia: 'uso-lengua',
+        componente: 'pragmatico',
+      },
+
+      // 5. Comprensión de lectura — inferencia (comprension-lectura / pragmatico)
+      {
+        id: 'eng-s11-p05',
+        enunciado: 'Read the following text and answer the question.\n\n"Maria studied engineering for five years. After graduating, she worked in a construction company for two years. She then decided to go back to university to get a master\'s degree in sustainable architecture. Today, she designs eco-friendly buildings in three different countries."\n\nWhat can be inferred about Maria?',
+        opciones: [
+          { letra: 'A', texto: 'She prefers to live and work in one country only.' },
+          { letra: 'B', texto: 'She abandoned her engineering career to become an architect.' },
+          { letra: 'C', texto: 'She is committed to professional growth and has an international career.' },
+          { letra: 'D', texto: 'She found her first job difficult and that is why she returned to university.' },
+        ],
+        clave: 'C',
+        justificacion: 'A partir del texto se puede inferir que María ha invertido continuamente en su formación (ingeniería, maestría en arquitectura sostenible) y trabaja en tres países, lo que indica compromiso con el desarrollo profesional y una carrera internacional. La opción A contradice la información (trabaja en tres países). La opción B es incorrecta porque complementó, no abandonó, su carrera. La opción D es una suposición no sustentada en el texto.',
+        competencia: 'comprension-lectura',
+        componente: 'pragmatico',
+      },
+    ],
+  },
+
 };
 
 if (typeof module !== 'undefined' && module.exports) {

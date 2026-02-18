@@ -14,7 +14,8 @@ const AREAS_EBC = {
   'matematicas': { nombre: 'Matemáticas', color: '#4f83f1', icon: '∑' },
   'lenguaje': { nombre: 'Lenguaje', color: '#19c37d', icon: '✎' },
   'ciencias-naturales': { nombre: 'Ciencias Naturales', color: '#f59e0b', icon: '⚗' },
-  'ciencias-sociales': { nombre: 'Ciencias Sociales', color: '#a78bfa', icon: '🌍' }
+  'ciencias-sociales': { nombre: 'Ciencias Sociales', color: '#a78bfa', icon: '🌍' },
+  'ingles': { nombre: 'Inglés', color: '#6366f1', icon: '🌐' }
 };
 
 function gradoAGrupoEBC(grado) {
@@ -44,7 +45,8 @@ function getEjesDeArea(areaId) {
     'matematicas': typeof EBC_MATEMATICAS !== 'undefined' ? EBC_MATEMATICAS : null,
     'lenguaje': typeof EBC_LENGUAJE !== 'undefined' ? EBC_LENGUAJE : null,
     'ciencias-naturales': typeof EBC_NATURALES !== 'undefined' ? EBC_NATURALES : null,
-    'ciencias-sociales': typeof EBC_SOCIALES !== 'undefined' ? EBC_SOCIALES : null
+    'ciencias-sociales': typeof EBC_SOCIALES !== 'undefined' ? EBC_SOCIALES : null,
+    'ingles': typeof EBC_INGLES !== 'undefined' ? EBC_INGLES : null
   };
   return areas[areaId]?.ejes || [];
 }
@@ -54,7 +56,8 @@ function getEstandares(areaId, grupoEBC, ejeId) {
     'matematicas': typeof EBC_MATEMATICAS !== 'undefined' ? EBC_MATEMATICAS : null,
     'lenguaje': typeof EBC_LENGUAJE !== 'undefined' ? EBC_LENGUAJE : null,
     'ciencias-naturales': typeof EBC_NATURALES !== 'undefined' ? EBC_NATURALES : null,
-    'ciencias-sociales': typeof EBC_SOCIALES !== 'undefined' ? EBC_SOCIALES : null
+    'ciencias-sociales': typeof EBC_SOCIALES !== 'undefined' ? EBC_SOCIALES : null,
+    'ingles': typeof EBC_INGLES !== 'undefined' ? EBC_INGLES : null
   };
   const area = areas[areaId];
   if (!area || !area.grupos[grupoEBC]) return [];
@@ -74,7 +77,8 @@ function getEstandarGeneral(areaId, grupoEBC) {
     'matematicas': typeof EBC_MATEMATICAS !== 'undefined' ? EBC_MATEMATICAS : null,
     'lenguaje': typeof EBC_LENGUAJE !== 'undefined' ? EBC_LENGUAJE : null,
     'ciencias-naturales': typeof EBC_NATURALES !== 'undefined' ? EBC_NATURALES : null,
-    'ciencias-sociales': typeof EBC_SOCIALES !== 'undefined' ? EBC_SOCIALES : null
+    'ciencias-sociales': typeof EBC_SOCIALES !== 'undefined' ? EBC_SOCIALES : null,
+    'ingles': typeof EBC_INGLES !== 'undefined' ? EBC_INGLES : null
   };
   return areas[areaId]?.grupos[grupoEBC]?.estandarGeneral || '';
 }

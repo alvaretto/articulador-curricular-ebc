@@ -12,7 +12,7 @@ CSS=$(cat src/ui/styles.css)
 
 # Leer todos los JS de datos
 DATA_JS=""
-for f in src/data/ebc-matematicas.js src/data/ebc-lenguaje.js src/data/ebc-naturales.js src/data/ebc-sociales.js src/data/dba.js src/data/planes-matematicas.js src/data/progresion-vertical.js src/data/icfes-matematicas.js src/data/icfes-lectura-critica.js src/data/icfes-naturales.js src/data/icfes-sociales.js src/data/preguntas-icfes.js; do
+for f in src/data/ebc-matematicas.js src/data/ebc-lenguaje.js src/data/ebc-naturales.js src/data/ebc-sociales.js src/data/ebc-ingles.js src/data/dba.js src/data/planes-matematicas.js src/data/progresion-vertical.js src/data/icfes-matematicas.js src/data/icfes-lectura-critica.js src/data/icfes-naturales.js src/data/icfes-sociales.js src/data/icfes-ingles.js src/data/preguntas-icfes.js; do
   DATA_JS+="$(cat "$f")"$'\n'
 done
 
