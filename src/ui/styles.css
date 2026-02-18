@@ -326,13 +326,13 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   font-weight: 700;
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
-  color: var(--text-primary);
+  color: #f0f1f5;
 }
 .header-badge-men small {
   font-size: 0.6rem;
   font-weight: 400;
   letter-spacing: var(--tracking-wide);
-  opacity: 0.7;
+  color: rgba(240,241,245,0.6);
 }
 
 .header-actions {
