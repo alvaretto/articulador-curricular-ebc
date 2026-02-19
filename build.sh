@@ -31,7 +31,10 @@ done
 IA_JS="$(cat src/ia/connector.js)"$'\n'"$(cat src/ia/templates.js)"
 
 # Leer JS de UI
-UI_JS=$(cat src/ui/app.js)
+UI_JS=""
+for f in src/ui/app-helpers.js src/ui/app-core.js src/ui/app-events.js src/ui/app-views.js src/ui/app-plan.js src/ui/app-simulacro.js src/ui/app-cobertura.js src/ui/app-dashboard.js; do
+  UI_JS+="$(cat "$f")"$'\n'
+done
 
 # Generar base64 de logos para embeber en standalone
 LOGO_DEFAULT=$(base64 -w0 src/assets/logo-default.png)

@@ -1,7 +1,7 @@
 // sw.js — Service Worker para Articulador Curricular
 // Estrategia: Network-first con fallback a cache
 
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const CACHE_CORE = 'articulador-core-' + CACHE_VERSION;
 const CACHE_DATA = 'articulador-data-' + CACHE_VERSION;
 const CACHE_LAZY = 'articulador-lazy-' + CACHE_VERSION;
@@ -15,7 +15,14 @@ const ASSETS_CORE = [
   './icon-192.png',
   './icon-512.png',
   './src/ui/styles.css',
-  './src/ui/app.js',
+  './src/ui/app-helpers.js',
+  './src/ui/app-core.js',
+  './src/ui/app-events.js',
+  './src/ui/app-views.js',
+  './src/ui/app-plan.js',
+  './src/ui/app-simulacro.js',
+  './src/ui/app-cobertura.js',
+  './src/ui/app-dashboard.js',
   './src/engine/filtros.js',
   './src/engine/articulacion.js',
   './src/engine/busqueda.js',
