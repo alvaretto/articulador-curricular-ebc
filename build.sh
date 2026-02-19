@@ -50,7 +50,7 @@ cat > dist/articulador-curricular.html << 'HTMLEOF'
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Articulador Curricular — Continuo Cognitivo</title>
-  <meta name="description" content="Articulador curricular colombiano. EBC, DBA e ICFES articulados. Progresión vertical, planes de periodo y simulacros Saber. 100% offline.">
+  <meta name="description" content="Articulador curricular colombiano. EBC, DBA e ICFES articulados en 5 áreas, grados 6-11. 460 preguntas ICFES, planes de periodo, simulacros cronometrados. 100% offline.">
   <meta name="theme-color" content="#0e1018">
   <style>
 HTMLEOF

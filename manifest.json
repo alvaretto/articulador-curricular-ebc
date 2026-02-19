@@ -1,7 +1,7 @@
 {
   "name": "Articulador Curricular",
   "short_name": "Articulador",
-  "description": "Articulador curricular colombiano. EBC, DBA e ICFES articulados. Progresión vertical, planes de periodo y simulacros Saber. 100% offline.",
+  "description": "Articulador curricular colombiano. EBC, DBA e ICFES articulados en 5 áreas, grados 6-11. 460 preguntas ICFES, planes de periodo, simulacros cronometrados. PWA offline.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0e1018",
