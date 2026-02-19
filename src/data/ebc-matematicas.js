@@ -296,4 +296,6 @@ const EBC_MATEMATICAS = {
   }
 };
 
-// EBC_MATEMATICAS disponible como variable global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = EBC_MATEMATICAS;
+}

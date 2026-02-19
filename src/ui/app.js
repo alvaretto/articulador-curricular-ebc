@@ -21,6 +21,26 @@ const EJE_SHORT_LABELS = {
   'Relaciones Ético-Políticas': 'Ético-Político'
 };
 
+// Mapeo eje EBC → componente ICFES (usado en renderICFESSection y renderEstandaresPorEje)
+const EJE_A_COMPONENTE = {
+  'numerico': 'numerico-variacional', 'variacional': 'numerico-variacional',
+  'espacial': 'geometrico-metrico', 'metrico': 'geometrico-metrico',
+  'aleatorio': 'aleatorio',
+  'comprension': 'semantico', 'literatura': 'semantico',
+  'produccion': 'sintactico', 'medios': 'pragmatico', 'etica': 'pragmatico',
+  'entorno-vivo': 'entorno-vivo', 'entorno-fisico': 'entorno-fisico',
+  'cts': 'cts', 'aprox-cientifica': 'cts',
+  'historico-cultural': 'conocimientos-sociales', 'espacial-ambiental': 'conocimientos-sociales',
+  'etico-politico': 'multiperspectividad',
+  'escucha': 'pragmatico', 'lectura': 'lexical', 'escritura': 'gramatical',
+  'monologo': 'pragmatico', 'conversacion': 'pragmatico'
+};
+const COMPONENTE_A_EJES = {};
+for (const [eje, comp] of Object.entries(EJE_A_COMPONENTE)) {
+  if (!COMPONENTE_A_EJES[comp]) COMPONENTE_A_EJES[comp] = [];
+  COMPONENTE_A_EJES[comp].push(eje);
+}
+
 const App = {
   state: {
     area: null,
@@ -34,7 +54,9 @@ const App = {
     sidebarOpen: false,
     iaPanelOpen: false,
     searchQuery: '',
-    simulacro: null // { area, pruebaId, preguntas, respuestas, actual, tiempoInicio, tiempoLimite, timerInterval, finalizado }
+    simulacro: null, // { area, pruebaId, preguntas, respuestas, actual, tiempoInicio, tiempoLimite, timerInterval, finalizado }
+    simulacroFiltros: { competencia: '', componente: '', numPreguntas: 0, modoRepaso: false },
+    planFiltroCompetencia: ''
   },
 
   init() {
@@ -111,10 +133,14 @@ const App = {
       this.state.searchQuery = decodeURIComponent(parts[1] || '');
     } else if (parts[0] === 'config') {
       this.state.vista = 'config';
+    } else if (parts[0] === 'dashboard') {
+      this.state.vista = 'dashboard';
     } else if (parts[0] === 'cobertura') {
       this.state.vista = 'cobertura';
       this.state.coberturaArea = parts[1] || null;
       this.state.coberturaGrupo = parts[2] || null;
+    } else if (parts[0] === 'simulacro-completo') {
+      this.state.vista = 'simulacro-completo';
     } else if (parts[0] === 'simulacro' && parts[1] && parts[2]) {
       // Simulacro activo: #/simulacro/{area}/{pruebaId}
       // Solo iniciar si no hay simulacro activo ya para ese area+prueba
@@ -138,6 +164,11 @@ const App = {
     Analytics.registrarVista(this.state.vista, this.state.area || this.state.grado || '');
     this.saveState();
     this.render();
+    // Focus management for screen readers
+    requestAnimationFrame(() => {
+      const h1 = document.querySelector('#main-content h1, #main-content .section-title');
+      if (h1) { h1.setAttribute('tabindex', '-1'); h1.focus(); }
+    });
   },
 
   navigate(hash) {
@@ -236,6 +267,52 @@ const App = {
             this.finalizarSimulacro(true);
           }
           break;
+        case 'ver-especificaciones': {
+          const areaSpec = target.dataset.area;
+          const pruebaSpec = target.dataset.prueba;
+          if (areaSpec && pruebaSpec) {
+            let modalContainer = document.getElementById('modal-container');
+            if (!modalContainer) {
+              modalContainer = document.createElement('div');
+              modalContainer.id = 'modal-container';
+              document.body.appendChild(modalContainer);
+            }
+            modalContainer.innerHTML = this.renderEspecificacionesPrueba(areaSpec, pruebaSpec);
+          }
+          break;
+        }
+        case 'cerrar-especificaciones': {
+          const cont = document.getElementById('modal-container');
+          if (cont) cont.innerHTML = '';
+          break;
+        }
+        case 'toggle-planes-para-aprendizaje': {
+          const apId = target.dataset.aprendizaje;
+          const areaAp = target.dataset.area;
+          if (!apId || !areaAp) break;
+          const containerId = 'planes-para-' + apId.replace(/[^a-z0-9-]/gi, '_');
+          let container = document.getElementById(containerId);
+          if (container) {
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+            break;
+          }
+          container = document.createElement('div');
+          container.id = containerId;
+          container.className = 'planes-para-aprendizaje';
+          const parentEl = target.closest('.icfes-aprendizaje');
+          if (parentEl) parentEl.appendChild(container);
+          const resultados = this._buscarAprendizajeEnPlanes(apId, areaAp);
+          if (!resultados.length) {
+            container.innerHTML = '<p class="text-xs text-muted" style="padding:4px 0">Este aprendizaje no aparece en ningun plan de periodo.</p>';
+          } else {
+            const prefixMap = { matematicas: 'plan', lenguaje: 'plan-lenguaje', naturales: 'plan-naturales', sociales: 'plan-sociales', ingles: 'plan-ingles' };
+            const prefix = prefixMap[areaAp] || 'plan';
+            container.innerHTML = '<div class="flex gap-2" style="flex-wrap:wrap;padding:4px 0">' +
+              resultados.map(r => '<a class="badge badge-accent" style="cursor:pointer;text-decoration:none;font-size:0.7rem" data-action="navigate" data-value="#/' + prefix + '/' + r.grado + '/' + r.periodo + '">' + r.label + '</a>').join('') +
+              '</div>';
+          }
+          break;
+        }
         case 'toggle-estandar': {
           const area = target.dataset.area;
           const grupo = target.dataset.grupo;
@@ -265,6 +342,27 @@ const App = {
             this.showToast('Estadísticas borradas');
           }
           break;
+        case 'limpiar-historial-simulacros':
+          Storage.limpiarHistorialSimulacros();
+          this.showToast('Historial limpiado');
+          if (this.state.vista === 'dashboard') this.render();
+          break;
+        case 'start-simulacro-completo': {
+          if (typeof PREGUNTAS_ICFES === 'undefined') {
+            const mainEl = document.getElementById('main-content');
+            if (mainEl) mainEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><div class="loading-spinner"></div></div><div class="empty-state-title">Cargando preguntas...</div></div>';
+            const scr = document.createElement('script');
+            scr.src = 'src/data/preguntas-icfes.js';
+            scr.onload = () => { this._initSimulacroCompletoState(); this.state.vista = 'simulacro-completo'; this.render(); };
+            scr.onerror = () => { this.showToast('Error cargando preguntas.'); this.state.vista = 'simulacro'; this.render(); };
+            document.head.appendChild(scr);
+          } else {
+            this._initSimulacroCompletoState();
+            this.state.vista = 'simulacro-completo';
+            this.render();
+          }
+          break;
+        }
       }
     });
 
@@ -292,6 +390,61 @@ const App = {
       if (e.target.id === 'select-grupo') this.onGrupoChange(e.target.value);
       if (e.target.id === 'select-area') this.onAreaChange(e.target.value);
       if (e.target.id === 'select-eje') this.onEjeChange(e.target.value);
+
+      // Simulacro tiempo config
+      if (e.target.id === 'simulacro-tiempo') {
+        this.state.simulacroTiempoConfig = parseInt(e.target.value);
+      }
+
+      // Simulacro filter: area -> populate competencia/componente
+      if (e.target.id === 'simulacro-filtro-area') {
+        const area = e.target.value;
+        this.state.simulacroFiltros.competencia = '';
+        this.state.simulacroFiltros.componente = '';
+        const compSel = document.getElementById('simulacro-filtro-competencia');
+        const compoSel = document.getElementById('simulacro-filtro-componente');
+        if (area && typeof getCompetenciasICFES === 'function') {
+          const comps = getCompetenciasICFES(area);
+          compSel.innerHTML = '<option value="">Todas</option>' + comps.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+          compSel.disabled = false;
+          const componentes = getComponentesICFES(area);
+          compoSel.innerHTML = '<option value="">Todos</option>' + componentes.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+          compoSel.disabled = false;
+        } else {
+          compSel.innerHTML = '<option value="">Todas</option>';
+          compSel.disabled = true;
+          compoSel.innerHTML = '<option value="">Todos</option>';
+          compoSel.disabled = true;
+        }
+      }
+
+      if (e.target.id === 'simulacro-filtro-competencia') {
+        this.state.simulacroFiltros.competencia = e.target.value;
+      }
+      if (e.target.id === 'simulacro-filtro-componente') {
+        this.state.simulacroFiltros.componente = e.target.value;
+      }
+      if (e.target.id === 'simulacro-filtro-num') {
+        this.state.simulacroFiltros.numPreguntas = parseInt(e.target.value) || 0;
+      }
+      if (e.target.id === 'simulacro-filtro-repaso') {
+        this.state.simulacroFiltros.modoRepaso = e.target.checked;
+      }
+      if (e.target.id === 'plan-filtro-competencia') {
+        this.state.planFiltroCompetencia = e.target.value;
+        const comp = e.target.value;
+        document.querySelectorAll('.plan-section').forEach(sec => {
+          if (!comp) { sec.classList.remove('plan-periodo-dim', 'plan-periodo-match'); return; }
+          const text = sec.textContent.toLowerCase();
+          if (text.includes(comp.toLowerCase())) {
+            sec.classList.remove('plan-periodo-dim');
+            sec.classList.add('plan-periodo-match');
+          } else {
+            sec.classList.remove('plan-periodo-match');
+            sec.classList.add('plan-periodo-dim');
+          }
+        });
+      }
     });
   },
 
@@ -326,6 +479,8 @@ const App = {
     if (query.length < 2) {
       results.innerHTML = '';
       results.style.display = 'none';
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) searchInput.setAttribute('aria-expanded', 'false');
       return;
     }
 
@@ -333,6 +488,8 @@ const App = {
     if (items.length === 0) {
       results.innerHTML = '<div class="search-result-item"><span class="text-muted text-sm">Sin resultados</span></div>';
       results.style.display = 'block';
+      const searchInputNoRes = document.getElementById('search-input');
+      if (searchInputNoRes) searchInputNoRes.setAttribute('aria-expanded', 'true');
       return;
     }
 
@@ -341,7 +498,7 @@ const App = {
       const grupoNav = item.grupo || (item.prueba ? pruebaAGrupo[item.prueba] : null) || gradoAGrupoEBC(item.grado || '8');
       const grupoLabel = item.grupo || (item.prueba ? pruebaAGrupo[item.prueba] : null) || ('Grado ' + item.grado);
       return `
-        <div class="search-result-item" data-action="navigate" data-value="#/area/${item.area}/${grupoNav}">
+        <div class="search-result-item" role="option" data-action="navigate" data-value="#/area/${item.area}/${grupoNav}">
           <span class="search-result-type">${item.tipo.toUpperCase()} · ${AREAS_EBC[item.area]?.nombre || item.area}</span>
           <div class="search-result-text">${highlightText(item.texto, query)}</div>
           <span class="badge badge-muted">${grupoLabel}</span>
@@ -349,6 +506,8 @@ const App = {
       `;
     }).join('');
     results.style.display = 'block';
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.setAttribute('aria-expanded', 'true');
   },
 
   // === IA HANDLERS ===
@@ -413,6 +572,8 @@ const App = {
     const backdrop = document.querySelector('.sidebar-backdrop');
     if (sidebar) sidebar.classList.toggle('open', this.state.sidebarOpen);
     if (backdrop) backdrop.classList.toggle('open', this.state.sidebarOpen);
+    const menuBtn = document.querySelector('[data-action="toggle-sidebar"]');
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', this.state.sidebarOpen ? 'true' : 'false');
   },
 
   updateIAPanel() {
@@ -453,7 +614,18 @@ const App = {
       case 'busqueda': main.innerHTML = this.renderBusqueda(); break;
       case 'config': main.innerHTML = this.renderConfig(); break;
       case 'simulacro': main.innerHTML = this.renderSimulacro(); break;
+      case 'dashboard': main.innerHTML = this.renderDashboard(); break;
       case 'cobertura': main.innerHTML = this.renderCobertura(); break;
+      case 'simulacro-completo':
+        if (this.state.simulacro && this.state.simulacro.finalizado) {
+          main.innerHTML = this.renderSimulacroCompletoResultados();
+        } else if (this.state.simulacro && this.state.simulacro.esMultiArea) {
+          main.innerHTML = this.renderSimulacroActivo();
+          this.startTimer();
+        } else {
+          main.innerHTML = this.renderSimulacro();
+        }
+        break;
       case 'simulacro-activo':
         if (this.state.simulacro && this.state.simulacro.finalizado) {
           main.innerHTML = this.renderSimulacroResultados();
@@ -712,6 +884,15 @@ const App = {
                        data-grupo="${grupo}"
                        data-idx="${globalIdx}"></div>
                   <span class="cobertura-estandar-texto">${e}</span>
+                  ${(() => {
+                    const compId = EJE_A_COMPONENTE[eje.id];
+                    if (!compId || typeof getAprendizajesICFES !== 'function') return '';
+                    const pruebaId = typeof getPruebaParaGrado === 'function' ? getPruebaParaGrado(grupo.split('-')[0]) : null;
+                    if (!pruebaId) return '';
+                    const icfesAp = getAprendizajesICFES(area, pruebaId, null, compId);
+                    if (!icfesAp.length) return '';
+                    return '<span class="estandar-icfes-badge badge badge-muted" title="' + icfesAp[0].enunciado.substring(0, 100) + '..." style="font-size:0.6rem;cursor:help;margin-left:4px">ICFES: ' + icfesAp.length + '</span>';
+                  })()}
                 </div>
               `;
             }).join('')}
@@ -823,36 +1004,6 @@ const App = {
     const { pruebaICFES, aprendizajes, competencias, componentes } = articulacion;
     const niveles = getNivelesDesempeno(area, pruebaICFES.id);
 
-    // Mapeo eje EBC → componente ICFES por área
-    const EJE_A_COMPONENTE = {
-      // Matemáticas
-      'numerico': 'numerico-variacional',
-      'variacional': 'numerico-variacional',
-      'espacial': 'geometrico-metrico',
-      'metrico': 'geometrico-metrico',
-      'aleatorio': 'aleatorio',
-      // Lenguaje
-      'comprension': 'semantico',
-      'literatura': 'semantico',
-      'produccion': 'sintactico',
-      'medios': 'pragmatico',
-      'etica': 'pragmatico',
-      // Ciencias Naturales
-      'entorno-vivo': 'entorno-vivo',
-      'entorno-fisico': 'entorno-fisico',
-      'cts': 'cts',
-      'aprox-cientifica': 'cts',
-      // Ciencias Sociales
-      'historico-cultural': 'conocimientos-sociales',
-      'espacial-ambiental': 'conocimientos-sociales',
-      'etico-politico': 'multiperspectividad',
-      // Inglés
-      'escucha': 'pragmatico',
-      'lectura': 'lexical',
-      'escritura': 'gramatical',
-      'monologo': 'pragmatico',
-      'conversacion': 'pragmatico'
-    };
     const componenteFiltro = ejeFiltro ? EJE_A_COMPONENTE[ejeFiltro] : null;
     const componentesFiltrados = componenteFiltro
       ? componentes.filter(c => c.id === componenteFiltro)
@@ -895,14 +1046,21 @@ const App = {
               <span class="badge badge-muted">${aprends.length} aprendizajes</span>
             </div>
             <div class="card-body">
-              ${aprends.map(a => `
+              ${aprends.map(a => {
+                const ejesRel = COMPONENTE_A_EJES[a.componente] || [];
+                const ebcHtml = ejesRel.length ? '<div class="icfes-ebc-links"><span class="text-xs text-muted">EBC:</span>' +
+                  ejesRel.map(eje => '<a class="badge badge-muted icfes-ebc-link" style="font-size:0.6rem;cursor:pointer" data-action="navigate" data-value="#/area/' + area + '/' + grupo + '/' + eje + '">' + eje + '</a>').join('') +
+                  '</div>' : '';
+                return `
                 <details class="icfes-aprendizaje">
                   <summary class="estandar-item" style="cursor:pointer; list-style:none">
                     <div class="flex items-center gap-2" style="flex-wrap:wrap">
                       <span class="badge badge-accent" style="font-size:0.65rem">${a.competencia}</span>
                       <span>${a.enunciado}</span>
+                      <button class="btn btn-ghost btn-sm" style="font-size:0.7rem;padding:2px 6px" data-action="toggle-planes-para-aprendizaje" data-aprendizaje="${a.id}" data-area="${area}">Ver en planes</button>
                     </div>
                   </summary>
+                  ${ebcHtml}
                   <div class="icfes-evidencias">
                     ${a.evidencias.map(e => `
                       <div class="icfes-evidencia-item">
@@ -911,7 +1069,7 @@ const App = {
                     `).join('')}
                   </div>
                 </details>
-              `).join('')}
+              `;}).join('')}
             </div>
           </div>
         `;
@@ -1101,6 +1259,16 @@ const App = {
         <span class="badge badge-muted">${plan.horasSemana} h/semana</span>
         <span class="badge badge-muted">${plan.horasTotales} horas total</span>
         ${plan.tiposPensamiento.map(t => `<span class="badge badge-accent">${t}</span>`).join('')}
+      </div>
+
+      <div class="plan-filtro-comp-bar mt-4">
+        <label class="text-xs text-muted">Filtrar por competencia ICFES:</label>
+        <select class="simulacro-config-select" id="plan-filtro-competencia" style="max-width:220px">
+          <option value="">Todas</option>
+          ${(typeof getCompetenciasICFES === 'function' ? getCompetenciasICFES(area) : []).map(c =>
+            '<option value="' + c + '"' + (this.state.planFiltroCompetencia === c ? ' selected' : '') + '>' + c + '</option>'
+          ).join('')}
+        </select>
       </div>
 
       <!-- Plan Grid -->
@@ -1417,19 +1585,19 @@ const App = {
         <div class="card-body">
           <div class="plan-grid" style="gap:var(--sp-3)">
             <div class="form-group">
-              <label class="form-label">Nombre</label>
+              <label class="form-label" for="cfg-nombre">Nombre</label>
               <input class="form-input" id="cfg-nombre" value="${inst.nombre}" placeholder="IE Pedacito de Cielo A.U.V">
             </div>
             <div class="form-group">
-              <label class="form-label">Código DANE</label>
+              <label class="form-label" for="cfg-dane">Código DANE</label>
               <input class="form-input" id="cfg-dane" value="${inst.dane}" placeholder="163401000298">
             </div>
             <div class="form-group">
-              <label class="form-label">Municipio</label>
+              <label class="form-label" for="cfg-municipio">Municipio</label>
               <input class="form-input" id="cfg-municipio" value="${inst.municipio}" placeholder="La Tebaida">
             </div>
             <div class="form-group">
-              <label class="form-label">Departamento</label>
+              <label class="form-label" for="cfg-depto">Departamento</label>
               <input class="form-input" id="cfg-depto" value="${inst.departamento}" placeholder="Quindío">
             </div>
           </div>
@@ -1447,7 +1615,7 @@ const App = {
             <a href="https://aistudio.google.com/apikey" target="_blank">Obtener API key gratis →</a>
           </p>
           <div class="form-group">
-            <label class="form-label">API Key de Gemini</label>
+            <label class="form-label" for="cfg-apikey">API Key de Gemini</label>
             <input class="form-input" id="cfg-apikey" type="password" value="${prefs.apiKeyGemini || ''}" placeholder="AIza...">
           </div>
           <div class="flex gap-2">
@@ -1591,24 +1759,31 @@ const App = {
     sidebar.innerHTML = `
       <div class="sidebar-section">
         <div class="search-container">
-          <span class="search-icon">🔍</span>
-          <input class="search-input" id="search-input" placeholder="Buscar aprendizajes...">
-          <div class="search-results" id="search-results" style="display:none"></div>
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input class="search-input" id="search-input"
+                 role="combobox"
+                 aria-label="Buscar en el articulador"
+                 aria-expanded="false"
+                 aria-autocomplete="list"
+                 aria-controls="search-results"
+                 aria-haspopup="listbox"
+                 placeholder="Buscar aprendizajes...">
+          <div class="search-results" id="search-results" role="listbox" aria-label="Resultados de búsqueda" style="display:none"></div>
         </div>
       </div>
 
       <div class="sidebar-label">Navegación</div>
       <ul class="sidebar-nav">
-        <li class="sidebar-item ${this.state.vista === 'home' ? 'active' : ''}" data-action="navigate" data-value="#/">
-          <span class="sidebar-item-icon">🏠</span> Inicio
+        <li class="sidebar-item ${this.state.vista === 'home' ? 'active' : ''}" ${this.state.vista === 'home' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/">
+          <span class="sidebar-item-icon" aria-hidden="true">🏠</span> Inicio
         </li>
       </ul>
 
       <div class="sidebar-label">Áreas Curriculares</div>
       <ul class="sidebar-nav">
         ${Object.entries(AREAS_EBC).map(([id, info]) => `
-          <li class="sidebar-item ${this.state.area === id && this.state.vista === 'area' ? 'active' : ''}" data-action="navigate" data-value="#/area/${id}/${this.state.grupo || '8-9'}">
-            <span class="sidebar-dot ${id === 'matematicas' ? 'mat' : id === 'lenguaje' ? 'len' : id === 'ciencias-naturales' ? 'nat' : 'soc'}"></span>
+          <li class="sidebar-item ${this.state.area === id && this.state.vista === 'area' ? 'active' : ''}" ${this.state.area === id && this.state.vista === 'area' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/area/${id}/${this.state.grupo || '8-9'}">
+            <span aria-hidden="true" class="sidebar-dot ${id === 'matematicas' ? 'mat' : id === 'lenguaje' ? 'len' : id === 'ciencias-naturales' ? 'nat' : 'soc'}"></span>
             ${info.nombre}
           </li>
         `).join('')}
@@ -1617,8 +1792,8 @@ const App = {
       <div class="sidebar-label">Planes de Periodo — Matemáticas</div>
       <ul class="sidebar-nav">
         ${['6','7','8','9','10','11'].map(g => `
-          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'matematicas' && this.state.vista === 'plan' ? 'active' : ''}" data-action="navigate" data-value="#/plan/${g}/1">
-            <span class="sidebar-item-icon">📋</span> Matemáticas ${g}°
+          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'matematicas' && this.state.vista === 'plan' ? 'active' : ''}" ${this.state.grado === g && this.state.area === 'matematicas' && this.state.vista === 'plan' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/plan/${g}/1">
+            <span class="sidebar-item-icon" aria-hidden="true">📋</span> Matemáticas ${g}°
           </li>
         `).join('')}
       </ul>
@@ -1626,8 +1801,8 @@ const App = {
       <div class="sidebar-label">Planes de Periodo — Lenguaje</div>
       <ul class="sidebar-nav">
         ${['6','7','8','9','10','11'].map(g => `
-          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'lenguaje' && this.state.vista === 'plan' ? 'active' : ''}" data-action="navigate" data-value="#/plan-lenguaje/${g}/1">
-            <span class="sidebar-item-icon">📖</span> Lenguaje ${g}°
+          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'lenguaje' && this.state.vista === 'plan' ? 'active' : ''}" ${this.state.grado === g && this.state.area === 'lenguaje' && this.state.vista === 'plan' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/plan-lenguaje/${g}/1">
+            <span class="sidebar-item-icon" aria-hidden="true">📖</span> Lenguaje ${g}°
           </li>
         `).join('')}
       </ul>
@@ -1635,8 +1810,8 @@ const App = {
       <div class="sidebar-label">Planes de Periodo — C. Naturales</div>
       <ul class="sidebar-nav">
         ${['6','7','8','9','10','11'].map(g => `
-          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'naturales' && this.state.vista === 'plan' ? 'active' : ''}" data-action="navigate" data-value="#/plan-naturales/${g}/1">
-            <span class="sidebar-item-icon">🔬</span> Naturales ${g}°
+          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'naturales' && this.state.vista === 'plan' ? 'active' : ''}" ${this.state.grado === g && this.state.area === 'naturales' && this.state.vista === 'plan' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/plan-naturales/${g}/1">
+            <span class="sidebar-item-icon" aria-hidden="true">🔬</span> Naturales ${g}°
           </li>
         `).join('')}
       </ul>
@@ -1644,8 +1819,8 @@ const App = {
       <div class="sidebar-label">Planes de Periodo — C. Sociales</div>
       <ul class="sidebar-nav">
         ${['6','7','8','9','10','11'].map(g => `
-          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'sociales' && this.state.vista === 'plan' ? 'active' : ''}" data-action="navigate" data-value="#/plan-sociales/${g}/1">
-            <span class="sidebar-item-icon">🏛</span> Sociales ${g}°
+          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'sociales' && this.state.vista === 'plan' ? 'active' : ''}" ${this.state.grado === g && this.state.area === 'sociales' && this.state.vista === 'plan' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/plan-sociales/${g}/1">
+            <span class="sidebar-item-icon" aria-hidden="true">🏛</span> Sociales ${g}°
           </li>
         `).join('')}
       </ul>
@@ -1653,27 +1828,30 @@ const App = {
       <div class="sidebar-label">Planes de Periodo — Inglés</div>
       <ul class="sidebar-nav">
         ${['6','7','8','9','10','11'].map(g => `
-          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'ingles' && this.state.vista === 'plan' ? 'active' : ''}" data-action="navigate" data-value="#/plan-ingles/${g}/1">
-            <span class="sidebar-item-icon">🌐</span> Inglés ${g}°
+          <li class="sidebar-item ${this.state.grado === g && this.state.area === 'ingles' && this.state.vista === 'plan' ? 'active' : ''}" ${this.state.grado === g && this.state.area === 'ingles' && this.state.vista === 'plan' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/plan-ingles/${g}/1">
+            <span class="sidebar-item-icon" aria-hidden="true">🌐</span> Inglés ${g}°
           </li>
         `).join('')}
       </ul>
 
       <div class="sidebar-label">Herramientas</div>
       <ul class="sidebar-nav">
-        <li class="sidebar-item ${this.state.vista === 'simulacro' || this.state.vista === 'simulacro-activo' ? 'active' : ''}" data-action="navigate" data-value="#/simulacro">
-          <span class="sidebar-item-icon">📝</span> Simulacro ICFES
+        <li class="sidebar-item ${this.state.vista === 'simulacro' || this.state.vista === 'simulacro-activo' ? 'active' : ''}" ${this.state.vista === 'simulacro' || this.state.vista === 'simulacro-activo' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/simulacro">
+          <span class="sidebar-item-icon" aria-hidden="true">📝</span> Simulacro ICFES
         </li>
-        <li class="sidebar-item ${this.state.vista === 'cobertura' ? 'active' : ''}" data-action="navigate" data-value="#/cobertura">
-          <span class="sidebar-item-icon">📊</span> Cobertura
+        <li class="sidebar-item ${this.state.vista === 'cobertura' ? 'active' : ''}" ${this.state.vista === 'cobertura' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/cobertura">
+          <span class="sidebar-item-icon" aria-hidden="true">📊</span> Cobertura
           ${this._sidebarCoberturaBadge()}
+        </li>
+        <li class="sidebar-item ${this.state.vista === 'dashboard' ? 'active' : ''}" ${this.state.vista === 'dashboard' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/dashboard">
+          <span class="sidebar-item-icon" aria-hidden="true">📈</span> Estadisticas
         </li>
       </ul>
 
       <div class="sidebar-label" style="margin-top:auto">Sistema</div>
       <ul class="sidebar-nav">
-        <li class="sidebar-item ${this.state.vista === 'config' ? 'active' : ''}" data-action="navigate" data-value="#/config">
-          <span class="sidebar-item-icon">⚙</span> Configuración
+        <li class="sidebar-item ${this.state.vista === 'config' ? 'active' : ''}" ${this.state.vista === 'config' ? 'aria-current="page"' : ''} data-action="navigate" data-value="#/config">
+          <span class="sidebar-item-icon" aria-hidden="true">⚙</span> Configuración
         </li>
       </ul>
     `;
@@ -1709,16 +1887,71 @@ const App = {
     return a;
   },
 
-  // Inicializa el estado del simulacro
+  // Inicia el simulacro: lazy-load de preguntas si no estan en memoria
   startSimulacro(area, pruebaId) {
-    // Limpiar timer anterior si existe
     if (this.state.simulacro && this.state.simulacro.timerInterval) {
       clearInterval(this.state.simulacro.timerInterval);
     }
 
-    const preguntas = (typeof PREGUNTAS_ICFES !== 'undefined' && PREGUNTAS_ICFES[area] && PREGUNTAS_ICFES[area][pruebaId])
-      ? this._shuffle(PREGUNTAS_ICFES[area][pruebaId])
+    // Si ya estan cargadas, iniciar directo
+    if (typeof PREGUNTAS_ICFES !== 'undefined') {
+      this._initSimulacroState(area, pruebaId);
+      return;
+    }
+
+    // Lazy load: mostrar estado de carga
+    const main = document.getElementById('main-content');
+    if (main) {
+      main.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon"><div class="loading-spinner"></div></div>
+          <div class="empty-state-title">Cargando banco de preguntas...</div>
+          <p class="empty-state-text">Descargando preguntas ICFES para el simulacro</p>
+        </div>`;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'src/data/preguntas-icfes.js';
+    script.onload = () => {
+      this._initSimulacroState(area, pruebaId);
+      this.state.vista = 'simulacro-activo';
+      this.render();
+    };
+    script.onerror = () => {
+      this.showToast('Error cargando preguntas. Verifica tu conexión.');
+      this.state.vista = 'simulacro';
+      this.render();
+    };
+    document.head.appendChild(script);
+  },
+
+  _initSimulacroState(area, pruebaId) {
+    let preguntas = (typeof PREGUNTAS_ICFES !== 'undefined' && PREGUNTAS_ICFES[area] && PREGUNTAS_ICFES[area][pruebaId])
+      ? PREGUNTAS_ICFES[area][pruebaId].slice()
       : [];
+
+    // Apply filters
+    const filtros = this.state.simulacroFiltros;
+    if (filtros.competencia) {
+      preguntas = preguntas.filter(p => p.competencia === filtros.competencia);
+    }
+    if (filtros.componente) {
+      preguntas = preguntas.filter(p => p.componente === filtros.componente);
+    }
+    // Modo Repaso: only wrong answers from last attempt
+    if (filtros.modoRepaso) {
+      const ultimo = Storage.getUltimoResultado(area, pruebaId);
+      if (ultimo && ultimo.wrongIds && ultimo.wrongIds.length > 0) {
+        const wrongSet = new Set(ultimo.wrongIds);
+        preguntas = preguntas.filter(p => wrongSet.has(p.id));
+      }
+    }
+    // Shuffle after filtering
+    preguntas = this._shuffle(preguntas);
+    // Limit number of questions
+    if (filtros.numPreguntas > 0 && preguntas.length > filtros.numPreguntas) {
+      preguntas = preguntas.slice(0, filtros.numPreguntas);
+    }
 
     // Tiempo limite: usar el configurado por el usuario (en minutos) o calcular automaticamente
     const tiempoConfigMinutos = this.state.simulacroTiempoConfig;
@@ -1788,7 +2021,7 @@ const App = {
     }, 1000);
   },
 
-  // Avanza a la siguiente pregunta o finaliza
+  // Avanza a la siguiente pregunta o finaliza (partial DOM update)
   nextPregunta() {
     if (!this.state.simulacro) return;
     const { preguntas, actual } = this.state.simulacro;
@@ -1799,24 +2032,55 @@ const App = {
     }
 
     this.state.simulacro.actual = actual + 1;
-    const main = document.getElementById('main-content');
-    if (main) {
-      main.innerHTML = this.renderSimulacroActivo();
-      // Restaurar seleccion si existe
-      const resp = this.state.simulacro.respuestas[this.state.simulacro.actual];
-      if (resp) {
-        document.querySelectorAll('.simulacro-opcion').forEach(el => {
-          el.classList.toggle('selected', el.dataset.value === resp);
-        });
-        const btnNext = document.getElementById('sim-btn-next');
-        if (btnNext) btnNext.disabled = false;
-      }
+    const sim = this.state.simulacro;
+    const pregunta = sim.preguntas[sim.actual];
+    const totalPreguntas = sim.preguntas.length;
+    const progPct = Math.round((sim.actual / totalPreguntas) * 100);
+    const esUltima = sim.actual + 1 >= totalPreguntas;
+    const respActual = sim.respuestas[sim.actual];
+
+    // Partial DOM updates (sin reemplazar innerHTML completo)
+    const progressBar = document.getElementById('sim-progress-bar');
+    if (progressBar) progressBar.style.width = progPct + '%';
+
+    const numEl = document.getElementById('sim-question-num');
+    if (numEl) numEl.textContent = `Pregunta ${sim.actual + 1} de ${totalPreguntas}`;
+
+    const enunciadoEl = document.getElementById('sim-enunciado');
+    if (enunciadoEl) enunciadoEl.innerHTML = pregunta.enunciado.replace(/\n/g, '<br>');
+
+    const opcionesEl = document.getElementById('sim-opciones');
+    if (opcionesEl) {
+      opcionesEl.innerHTML = pregunta.opciones.map(op => `
+        <div class="simulacro-opcion ${respActual === op.letra ? 'selected' : ''}"
+             role="radio"
+             aria-checked="${respActual === op.letra ? 'true' : 'false'}"
+             tabindex="${respActual === op.letra ? '0' : '-1'}"
+             data-action="simulacro-respuesta"
+             data-value="${op.letra}">
+          <span class="simulacro-opcion-letra" aria-hidden="true">${op.letra}</span>
+          <span class="simulacro-opcion-texto">${op.texto}</span>
+        </div>
+      `).join('');
+    }
+
+    const btnNext = document.getElementById('sim-btn-next');
+    if (btnNext) {
+      btnNext.disabled = !respActual;
+      btnNext.dataset.action = esUltima ? 'simulacro-finalizar' : 'simulacro-next';
+      btnNext.textContent = esUltima ? 'Finalizar Simulacro' : 'Siguiente Pregunta';
     }
   },
 
   // Finaliza el simulacro y muestra resultados
   finalizarSimulacro(abandonar) {
     if (!this.state.simulacro) return;
+
+    // Multi-area: finalize section instead of entire simulacro
+    if (this.state.simulacro.esMultiArea && !abandonar) {
+      this._finalizarSeccionMultiArea();
+      return;
+    }
 
     if (this.state.simulacro.timerInterval) {
       clearInterval(this.state.simulacro.timerInterval);
@@ -1825,10 +2089,113 @@ const App = {
     this.state.simulacro.finalizado = true;
     this.state.simulacro.tiempoFin = Date.now();
 
+    // Persistir resultado si no fue abandonado
+    if (!abandonar) {
+      const sim = this.state.simulacro;
+      const preguntas = sim.preguntas;
+      const respuestas = sim.respuestas;
+      const porCompetencia = {};
+      const porComponente = {};
+      let correctas = 0;
+      const wrongIds = [];
+      preguntas.forEach((p, i) => {
+        const ok = respuestas[i] === p.clave;
+        if (ok) correctas++;
+        else if (respuestas[i]) wrongIds.push(p.id);
+        const comp = p.competencia || 'otro';
+        const componente = p.componente || 'otro';
+        if (!porCompetencia[comp]) porCompetencia[comp] = { total: 0, correctas: 0 };
+        porCompetencia[comp].total++;
+        if (ok) porCompetencia[comp].correctas++;
+        if (!porComponente[componente]) porComponente[componente] = { total: 0, correctas: 0 };
+        porComponente[componente].total++;
+        if (ok) porComponente[componente].correctas++;
+      });
+      Storage.saveSimulacroResult({
+        area: sim.area,
+        pruebaId: sim.pruebaId,
+        correctas,
+        total: preguntas.length,
+        porcentaje: Math.round((correctas / preguntas.length) * 100),
+        tiempoUsado: Math.floor((sim.tiempoFin - sim.tiempoInicio) / 1000),
+        porCompetencia,
+        porComponente,
+        wrongIds
+      });
+    }
+
     const main = document.getElementById('main-content');
     if (main) {
       main.innerHTML = this.renderSimulacroResultados(abandonar);
     }
+  },
+
+  _buscarAprendizajeEnPlanes(aprendizajeId, area) {
+    const planesMap = {
+      matematicas: typeof PLANES_MATEMATICAS !== 'undefined' ? PLANES_MATEMATICAS : null,
+      lenguaje: typeof PLANES_LENGUAJE !== 'undefined' ? PLANES_LENGUAJE : null,
+      naturales: typeof PLANES_NATURALES !== 'undefined' ? PLANES_NATURALES : null,
+      sociales: typeof PLANES_SOCIALES !== 'undefined' ? PLANES_SOCIALES : null,
+      ingles: typeof PLANES_INGLES !== 'undefined' ? PLANES_INGLES : null,
+    };
+    const planes = planesMap[area];
+    if (!planes) return [];
+    const resultados = [];
+    for (const [grado, planGrado] of Object.entries(planes)) {
+      const periodos = Array.isArray(planGrado.periodos) ? planGrado.periodos : Object.values(planGrado.periodos || {});
+      for (const periodo of periodos) {
+        if (Array.isArray(periodo.aprendizajesICFES) && periodo.aprendizajesICFES.includes(aprendizajeId)) {
+          resultados.push({ grado, periodo: periodo.periodo, label: 'Grado ' + grado + ' P' + periodo.periodo });
+        }
+      }
+    }
+    return resultados;
+  },
+
+  renderEspecificacionesPrueba(area, pruebaId) {
+    if (typeof getICFESData !== 'function') return '';
+    const data = getICFESData(area);
+    if (!data || !data.pruebas[pruebaId]) return '';
+    const prueba = data.pruebas[pruebaId];
+    const niveles = typeof getNivelesDesempeno === 'function' ? getNivelesDesempeno(area, pruebaId) : [];
+    const competencias = typeof getCompetenciasICFES === 'function' ? getCompetenciasICFES(area) : [];
+    const componentes = typeof getComponentesICFES === 'function' ? getComponentesICFES(area) : [];
+    const numPreguntas = (typeof PREGUNTAS_ICFES !== 'undefined') ? (PREGUNTAS_ICFES[area]?.[pruebaId]?.length || 'N/D') : 'N/D';
+    const tiempoSugerido = pruebaId === 'saber-11' ? '130 min' : pruebaId === 'saber-9' ? '80 min' : '60 min';
+
+    return `
+      <div class="especificaciones-modal" id="especif-modal" role="dialog" aria-modal="true">
+        <div class="especificaciones-modal-overlay" data-action="cerrar-especificaciones"></div>
+        <div class="especificaciones-modal-panel">
+          <div class="especificaciones-modal-header">
+            <h2 style="margin:0;font-size:var(--text-lg)">${prueba.nombre} — ${data.nombre}</h2>
+            <button class="btn btn-ghost btn-sm" data-action="cerrar-especificaciones" aria-label="Cerrar">✕</button>
+          </div>
+          <div class="especificaciones-modal-body">
+            <div class="especif-meta-grid">
+              <div class="especif-meta-item">
+                <span class="especif-meta-label">Preguntas</span>
+                <span class="especif-meta-value">${numPreguntas}</span>
+              </div>
+              <div class="especif-meta-item">
+                <span class="especif-meta-label">Tiempo</span>
+                <span class="especif-meta-value">${tiempoSugerido}</span>
+              </div>
+              <div class="especif-meta-item">
+                <span class="especif-meta-label">Grados</span>
+                <span class="especif-meta-value">${prueba.grados?.join(', ') || 'N/D'}</span>
+              </div>
+            </div>
+            <h3 class="especif-section-title">Competencias evaluadas</h3>
+            ${competencias.map(c => '<div class="especif-comp-item"><strong>' + c.nombre + '</strong><p class="text-sm text-secondary">' + c.descripcion + '</p></div>').join('')}
+            <h3 class="especif-section-title">Componentes</h3>
+            ${componentes.map(c => '<div class="especif-comp-item"><strong>' + c.nombre + '</strong><p class="text-sm text-secondary">' + c.descripcion + '</p></div>').join('')}
+            ${niveles.length ? '<h3 class="especif-section-title">Niveles de Desempeno</h3>' +
+              niveles.map(n => '<div class="especif-nivel" style="border-left:3px solid ' + n.color + '"><strong>' + n.nombre + '</strong> <span class="text-xs text-muted">(' + n.rango[0] + '–' + n.rango[1] + ')</span></div>').join('') : ''}
+          </div>
+        </div>
+      </div>
+    `;
   },
 
   // Vista de seleccion de simulacro
@@ -1847,6 +2214,7 @@ const App = {
         return `
           <div class="simulacro-card card ${tienePreguntas ? '' : 'simulacro-card-disabled'}">
             <div class="card-body">
+              ${tienePreguntas ? '<button class="btn btn-ghost btn-sm simulacro-card-info" data-action="ver-especificaciones" data-area="' + area.id + '" data-prueba="' + prueba.id + '" title="Especificaciones" aria-label="Ver especificaciones"><i>i</i></button>' : ''}
               <div class="simulacro-card-icon">${area.icon}</div>
               <div class="simulacro-card-area">${area.nombre}</div>
               <div class="simulacro-card-prueba">${prueba.nombre}</div>
@@ -1855,6 +2223,18 @@ const App = {
                   <span class="badge badge-muted">${numPreguntas} preguntas</span>
                   <span class="badge badge-muted">~${minutos} min</span>
                 </div>
+                ${(() => {
+                  const ultimo = Storage.getUltimoResultado(area.id, prueba.id);
+                  if (!ultimo) return '';
+                  const uColor = ultimo.porcentaje >= 70 ? 'var(--success)' : ultimo.porcentaje >= 50 ? 'var(--warning)' : 'var(--danger)';
+                  return '<div class="simulacro-ultimo-resultado">' +
+                    '<span class="text-xs text-muted">Ultimo:</span> ' +
+                    '<span class="badge" style="background:' + uColor + ';color:white">' +
+                      ultimo.correctas + '/' + ultimo.total + ' · ' + ultimo.porcentaje + '%' +
+                    '</span> ' +
+                    '<span class="text-xs text-muted">' + new Date(ultimo.fecha).toLocaleDateString('es-CO') + '</span>' +
+                  '</div>';
+                })()}
                 <button class="btn btn-primary w-full mt-4"
                         data-action="start-simulacro-card"
                         data-area="${area.id}"
@@ -1891,8 +2271,66 @@ const App = {
         </select>
       </div>
 
+      <div class="simulacro-filter-bar card">
+        <div class="card-body">
+          <div class="simulacro-filter-title text-xs text-muted" style="margin-bottom:var(--sp-2)">Filtros opcionales (aplicados al iniciar simulacro)</div>
+          <div class="simulacro-filter-groups">
+            <div class="simulacro-filter-group">
+              <label class="text-xs text-muted">Area</label>
+              <select class="simulacro-config-select" id="simulacro-filtro-area" data-action="simulacro-filtro-area-change">
+                <option value="">Seleccionar area</option>
+                <option value="matematicas">Matematicas</option>
+                <option value="lenguaje">Lectura Critica</option>
+                <option value="naturales">C. Naturales</option>
+                <option value="sociales">Sociales</option>
+                <option value="ingles">Ingles</option>
+              </select>
+            </div>
+            <div class="simulacro-filter-group">
+              <label class="text-xs text-muted">Competencia</label>
+              <select class="simulacro-config-select" id="simulacro-filtro-competencia" disabled>
+                <option value="">Todas</option>
+              </select>
+            </div>
+            <div class="simulacro-filter-group">
+              <label class="text-xs text-muted">Componente</label>
+              <select class="simulacro-config-select" id="simulacro-filtro-componente" disabled>
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div class="simulacro-filter-group">
+              <label class="text-xs text-muted">Num. preguntas</label>
+              <select class="simulacro-config-select" id="simulacro-filtro-num">
+                <option value="0" ${this.state.simulacroFiltros.numPreguntas === 0 ? 'selected' : ''}>Todas</option>
+                <option value="5" ${this.state.simulacroFiltros.numPreguntas === 5 ? 'selected' : ''}>5</option>
+                <option value="10" ${this.state.simulacroFiltros.numPreguntas === 10 ? 'selected' : ''}>10</option>
+                <option value="15" ${this.state.simulacroFiltros.numPreguntas === 15 ? 'selected' : ''}>15</option>
+                <option value="20" ${this.state.simulacroFiltros.numPreguntas === 20 ? 'selected' : ''}>20</option>
+                <option value="30" ${this.state.simulacroFiltros.numPreguntas === 30 ? 'selected' : ''}>30</option>
+              </select>
+            </div>
+            <div class="simulacro-filter-group">
+              <label class="simulacro-filter-checkbox">
+                <input type="checkbox" id="simulacro-filtro-repaso" ${this.state.simulacroFiltros.modoRepaso ? 'checked' : ''}>
+                <span class="text-xs">Solo incorrectas (Repaso)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="simulacro-grid">
         ${cards}
+      </div>
+
+      <div class="card simulacro-multiarea-card mt-4">
+        <div class="card-body" style="text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:var(--sp-2)">📐📖🔬🏛🌐</div>
+          <div class="card-title">Saber 11 Completo</div>
+          <p class="text-sm text-muted mt-2">Simulacion completa de las 5 areas en secuencia. Matematicas (55 min), Lectura Critica (55 min), Naturales (50 min), Sociales (50 min), Ingles (40 min)</p>
+          <p class="text-xs text-muted mt-1">4 horas 30 minutos</p>
+          <button class="btn btn-primary mt-4" data-action="start-simulacro-completo">Iniciar Saber 11 Completo</button>
+        </div>
       </div>
     `;
   },
@@ -1944,30 +2382,33 @@ const App = {
         <div class="simulacro-header-info">
           <span class="badge badge-muted">${areaLabels[area] || area}</span>
           <span class="badge badge-muted">${pruebaLabels[pruebaId] || pruebaId}</span>
-          <span class="simulacro-num">Pregunta ${actual + 1} de ${totalPreguntas}</span>
+          <span class="simulacro-num" id="sim-question-num">Pregunta ${actual + 1} de ${totalPreguntas}</span>
         </div>
         <div class="simulacro-header-controls">
-          <div class="simulacro-timer ${timerClase}" id="sim-timer">${timerTexto}</div>
+          <div class="simulacro-timer ${timerClase}" id="sim-timer" aria-label="Tiempo restante" role="timer">${timerTexto}</div>
           <button class="btn btn-ghost btn-sm" data-action="simulacro-abandonar">Abandonar</button>
         </div>
       </div>
 
       <!-- Barra de progreso -->
       <div class="simulacro-progress">
-        <div class="simulacro-progress-bar" style="width:${progPct}%"></div>
+        <div class="simulacro-progress-bar" id="sim-progress-bar" style="width:${progPct}%"></div>
       </div>
 
       <!-- Pregunta actual -->
       <div class="simulacro-pregunta card">
         <div class="card-body">
-          <div class="simulacro-enunciado">${pregunta.enunciado.replace(/\n/g, '<br>')}</div>
+          <div class="simulacro-enunciado" id="sim-enunciado">${pregunta.enunciado.replace(/\n/g, '<br>')}</div>
 
-          <div class="simulacro-opciones">
+          <div class="simulacro-opciones" id="sim-opciones" role="radiogroup" aria-label="Opciones de respuesta">
             ${pregunta.opciones.map(op => `
               <div class="simulacro-opcion ${respActual === op.letra ? 'selected' : ''}"
+                   role="radio"
+                   aria-checked="${respActual === op.letra ? 'true' : 'false'}"
+                   tabindex="${respActual === op.letra ? '0' : '-1'}"
                    data-action="simulacro-respuesta"
                    data-value="${op.letra}">
-                <span class="simulacro-opcion-letra">${op.letra}</span>
+                <span class="simulacro-opcion-letra" aria-hidden="true">${op.letra}</span>
                 <span class="simulacro-opcion-texto">${op.texto}</span>
               </div>
             `).join('')}
@@ -1991,6 +2432,88 @@ const App = {
         }
       </div>
     `;
+  },
+
+  // Build narrative summary of strengths and opportunities
+  _buildNarrativaSummary(porCompetencia, area) {
+    const fortalezas = [];
+    const oportunidades = [];
+    for (const [comp, datos] of Object.entries(porCompetencia)) {
+      const pct = datos.total > 0 ? Math.round((datos.correctas / datos.total) * 100) : 0;
+      if (pct >= 70) fortalezas.push({ comp, pct });
+      else if (pct < 50) oportunidades.push({ comp, pct });
+    }
+    if (fortalezas.length === 0 && oportunidades.length === 0) return '';
+    let html = '<div class="sim-narrativa card"><div class="card-body">';
+    html += '<div class="card-title" style="margin-bottom:var(--sp-2)">Analisis de Desempeno</div>';
+    if (fortalezas.length > 0) {
+      html += '<div class="sim-narrativa-seccion"><span class="sim-narrativa-label" style="color:var(--success)">Fortalezas:</span> ';
+      html += fortalezas.map(f => '<span class="badge" style="background:var(--success);color:white;margin-right:var(--sp-1)">' + f.comp + ' (' + f.pct + '%)</span>').join('');
+      html += '</div>';
+    }
+    if (oportunidades.length > 0) {
+      html += '<div class="sim-narrativa-seccion" style="margin-top:var(--sp-2)"><span class="sim-narrativa-label" style="color:var(--danger)">Oportunidades de mejora:</span> ';
+      html += oportunidades.map(o => '<span class="badge" style="background:var(--danger);color:white;margin-right:var(--sp-1)">' + o.comp + ' (' + o.pct + '%)</span>').join('');
+      html += '</div>';
+    }
+    html += '</div></div>';
+    return html;
+  },
+
+  // Build comparison with previous result
+  _buildComparacion(area, pruebaId, porcentajeActual) {
+    const historial = Storage.getSimulacroResults(area);
+    // Find previous result (index 0 is the one just saved, index 1 is previous)
+    const anterior = historial.length > 1 ? historial[1] : null;
+    if (!anterior || anterior.pruebaId !== pruebaId) return '';
+    const diff = porcentajeActual - anterior.porcentaje;
+    if (diff === 0) return '<div class="sim-comparacion"><span class="text-muted text-sm">Mismo resultado que el intento anterior (' + anterior.porcentaje + '%)</span></div>';
+    const flecha = diff > 0 ? '↑' : '↓';
+    const color = diff > 0 ? 'var(--success)' : 'var(--danger)';
+    const signo = diff > 0 ? '+' : '';
+    return '<div class="sim-comparacion card"><div class="card-body" style="padding:var(--sp-3)">' +
+      '<span class="text-sm text-muted">vs. anterior: </span>' +
+      '<span style="color:' + color + ';font-weight:600;font-size:1.1rem">' + flecha + ' ' + signo + diff + '%</span>' +
+      '<span class="text-sm text-muted" style="margin-left:var(--sp-2)">(' + anterior.porcentaje + '% → ' + porcentajeActual + '%)</span>' +
+    '</div></div>';
+  },
+
+  // Build "Aprendizajes a Reforzar" section from incorrect answers
+  _buildAprendizajesReforzar(detalles, area, pruebaId) {
+    const incorrectas = detalles.filter(d => !d.esCorrecto && d.respuesta);
+    if (incorrectas.length === 0) return '';
+    // Group by competencia
+    const porComp = {};
+    for (const d of incorrectas) {
+      const comp = d.pregunta.competencia || 'otro';
+      if (!porComp[comp]) porComp[comp] = [];
+      porComp[comp].push(d);
+    }
+    // Get relevant aprendizajes from ICFES data
+    let html = '<div class="sim-reforzar card"><div class="card-header"><span class="card-title">Aprendizajes a Reforzar</span></div><div class="card-body">';
+    for (const [comp, items] of Object.entries(porComp)) {
+      html += '<div class="sim-reforzar-comp">';
+      html += '<div class="sim-reforzar-comp-title">' + comp + ' <span class="badge badge-muted">' + items.length + ' incorrectas</span></div>';
+      // Get top 3 aprendizajes for this competencia
+      if (typeof getAprendizajesICFES === 'function') {
+        const aprendizajes = getAprendizajesICFES(area, pruebaId, comp).slice(0, 3);
+        if (aprendizajes.length > 0) {
+          html += '<ul class="sim-reforzar-list">';
+          for (const a of aprendizajes) {
+            // Determine grupo for the area link
+            const grupo = pruebaId === 'saber-9' ? '8-9' : '10-11';
+            html += '<li class="sim-reforzar-item">';
+            html += '<span class="text-sm">' + a.enunciado + '</span>';
+            html += ' <a href="#/area/' + area + '/' + grupo + '" class="sim-reforzar-link text-xs">Ver en area →</a>';
+            html += '</li>';
+          }
+          html += '</ul>';
+        }
+      }
+      html += '</div>';
+    }
+    html += '</div></div>';
+    return html;
   },
 
   // Pantalla de resultados
@@ -2064,6 +2587,9 @@ const App = {
           </div>
         </div>
 
+        ${!abandonado ? this._buildNarrativaSummary(porCompetencia, area) : ''}
+        ${!abandonado ? this._buildComparacion(area, pruebaId, porcentaje) : ''}
+
         <!-- Desglose por competencia -->
         <div class="card">
           <div class="card-header">
@@ -2127,6 +2653,8 @@ const App = {
             `).join('')}
           </div>
         </div>
+
+        ${!abandonado ? this._buildAprendizajesReforzar(detalles, area, pruebaId) : ''}
       </div>
     `;
   },
@@ -2491,25 +3019,218 @@ const App = {
     `;
   },
 
+  // === DASHBOARD ===
+  renderDashboard() {
+    var historial = Storage.getSimulacroResults();
+    var areaLabels = { matematicas: 'Matematicas', lenguaje: 'Lectura Critica', naturales: 'C. Naturales', sociales: 'Sociales', ingles: 'Ingles' };
+    var pruebaLabels = { 'saber-9': 'Saber 9', 'saber-11': 'Saber 11', 'saber-11-completo': 'Saber 11 Completo' };
+    var tableRows = '';
+    if (historial.length === 0) {
+      tableRows = '<tr><td colspan="5" style="text-align:center;padding:var(--sp-4)" class="text-muted">No hay resultados aun. Completa un simulacro para ver estadisticas.</td></tr>';
+    } else {
+      for (var r of historial) {
+        var color = r.porcentaje >= 70 ? 'var(--success)' : r.porcentaje >= 50 ? 'var(--warning)' : 'var(--danger)';
+        var fecha = new Date(r.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+        var min = Math.floor(r.tiempoUsado / 60);
+        var seg = r.tiempoUsado % 60;
+        tableRows += '<tr><td>' + fecha + '</td><td>' + (areaLabels[r.area] || r.area) + '</td><td>' + (pruebaLabels[r.pruebaId] || r.pruebaId) + '</td><td><span style="color:' + color + ';font-weight:600">' + r.porcentaje + '%</span> <span class="text-xs text-muted">(' + r.correctas + '/' + r.total + ')</span></td><td>' + min + ':' + String(seg).padStart(2, '0') + '</td></tr>';
+      }
+    }
+    var trendHtml = '';
+    var groups = {};
+    for (var r of historial) {
+      var key = r.area + '|' + r.pruebaId;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(r);
+    }
+    for (var gkey of Object.keys(groups)) {
+      var items = groups[gkey];
+      var parts = gkey.split('|');
+      var last5 = items.slice(0, 5).reverse();
+      var bars = '';
+      for (var it of last5) {
+        var bc = it.porcentaje >= 70 ? 'var(--success)' : it.porcentaje >= 50 ? 'var(--warning)' : 'var(--danger)';
+        bars += '<div class="trend-bar-wrap"><div class="trend-bar" style="height:' + it.porcentaje + '%;background:' + bc + '" title="' + it.porcentaje + '%"></div><span class="trend-bar-label">' + it.porcentaje + '%</span></div>';
+      }
+      trendHtml += '<div class="trend-group"><div class="trend-group-title">' + (areaLabels[parts[0]] || parts[0]) + ' · ' + (pruebaLabels[parts[1]] || parts[1]) + '</div><div class="trend-bars">' + bars + '</div></div>';
+    }
+    var recoHtml = '';
+    var areaAvgs = {};
+    for (var r of historial) {
+      if (!areaAvgs[r.area]) areaAvgs[r.area] = { sum: 0, count: 0 };
+      areaAvgs[r.area].sum += r.porcentaje;
+      areaAvgs[r.area].count++;
+    }
+    var lowAreas = Object.entries(areaAvgs).filter(function(e) { return (e[1].sum / e[1].count) < 60; }).sort(function(a, b) { return (a[1].sum / a[1].count) - (b[1].sum / b[1].count); });
+    if (lowAreas.length > 0) {
+      recoHtml = '<div class="card mt-4"><div class="card-header"><span class="card-title">Recomendaciones</span></div><div class="card-body"><ul class="reco-list">';
+      for (var la of lowAreas) {
+        var avg = Math.round(la[1].sum / la[1].count);
+        recoHtml += '<li class="reco-item"><span class="badge" style="background:var(--danger);color:white">' + (areaLabels[la[0]] || la[0]) + ': ' + avg + '% promedio</span> <span class="text-sm">— Reforzar esta area. </span><a href="#/area/' + la[0] + '/8-9" class="text-sm" style="color:var(--accent)">Ver estandares</a></li>';
+      }
+      recoHtml += '</ul></div></div>';
+    }
+    return '<h1 class="section-title">Estadisticas ICFES</h1>' +
+      '<p class="section-description">Historial de simulacros, tendencias y recomendaciones.</p>' +
+      '<div class="card mt-4"><div class="card-header"><span class="card-title">Historial de Simulacros</span><span class="badge badge-muted">' + historial.length + ' intentos</span></div>' +
+      '<div class="card-body" style="padding:0;overflow-x:auto"><table class="dashboard-tabla"><thead><tr><th>Fecha</th><th>Area</th><th>Prueba</th><th>Resultado</th><th>Tiempo</th></tr></thead><tbody>' + tableRows + '</tbody></table></div></div>' +
+      (trendHtml ? '<div class="card mt-4"><div class="card-header"><span class="card-title">Tendencia</span></div><div class="card-body"><div class="trend-container">' + trendHtml + '</div></div></div>' : '') +
+      recoHtml +
+      '<div class="flex gap-2 mt-4"><button class="btn btn-secondary" data-action="navigate" data-value="#/simulacro">Nuevo Simulacro</button><button class="btn btn-ghost" data-action="limpiar-historial-simulacros">Limpiar Historial</button></div>';
+  },
+
+  // === SIMULACRO SABER 11 COMPLETO ===
+  _initSimulacroCompletoState() {
+    var secciones = [
+      { area: 'matematicas', nombre: 'Matematicas', pruebaId: 'saber-11', tiempo: 55 * 60, icon: '📐' },
+      { area: 'lenguaje', nombre: 'Lectura Critica', pruebaId: 'saber-11', tiempo: 55 * 60, icon: '📖' },
+      { area: 'naturales', nombre: 'C. Naturales', pruebaId: 'saber-11', tiempo: 50 * 60, icon: '🔬' },
+      { area: 'sociales', nombre: 'Sociales', pruebaId: 'saber-11', tiempo: 50 * 60, icon: '🏛' },
+      { area: 'ingles', nombre: 'Ingles', pruebaId: 'saber-11', tiempo: 40 * 60, icon: '🌐' }
+    ];
+    var sec = secciones[0];
+    var preguntas = [];
+    if (typeof PREGUNTAS_ICFES !== 'undefined' && PREGUNTAS_ICFES[sec.area] && PREGUNTAS_ICFES[sec.area][sec.pruebaId]) {
+      preguntas = this._shuffle(PREGUNTAS_ICFES[sec.area][sec.pruebaId]);
+    }
+    this.state.simulacro = {
+      area: sec.area, pruebaId: sec.pruebaId, preguntas: preguntas,
+      respuestas: {}, actual: 0, tiempoInicio: Date.now(),
+      tiempoLimite: sec.tiempo, tiempoRestante: sec.tiempo,
+      timerInterval: null, finalizado: false,
+      esMultiArea: true, secciones: secciones, seccionActual: 0, resultadosSecciones: []
+    };
+  },
+
+  _finalizarSeccionMultiArea() {
+    var sim = this.state.simulacro;
+    if (!sim || !sim.esMultiArea) return;
+    var preguntas = sim.preguntas;
+    var respuestas = sim.respuestas;
+    var correctas = 0;
+    var wrongIds = [];
+    preguntas.forEach(function(p, i) {
+      if (respuestas[i] === p.clave) correctas++;
+      else if (respuestas[i]) wrongIds.push(p.id);
+    });
+    sim.resultadosSecciones.push({
+      area: sim.area, pruebaId: sim.pruebaId,
+      nombre: sim.secciones[sim.seccionActual].nombre,
+      icon: sim.secciones[sim.seccionActual].icon,
+      correctas: correctas, total: preguntas.length,
+      porcentaje: preguntas.length > 0 ? Math.round((correctas / preguntas.length) * 100) : 0,
+      tiempoUsado: Math.floor((Date.now() - sim.tiempoInicio) / 1000),
+      wrongIds: wrongIds
+    });
+    if (sim.timerInterval) { clearInterval(sim.timerInterval); sim.timerInterval = null; }
+    if (sim.seccionActual + 1 < sim.secciones.length) {
+      sim.seccionActual++;
+      this._showSeccionTransicion();
+    } else {
+      sim.finalizado = true;
+      sim.tiempoFin = Date.now();
+      var tc = 0, tp = 0, aw = [];
+      for (var res of sim.resultadosSecciones) { tc += res.correctas; tp += res.total; aw = aw.concat(res.wrongIds); }
+      Storage.saveSimulacroResult({
+        area: 'multi', pruebaId: 'saber-11-completo',
+        correctas: tc, total: tp,
+        porcentaje: tp > 0 ? Math.round((tc / tp) * 100) : 0,
+        tiempoUsado: sim.resultadosSecciones.reduce(function(s, r) { return s + r.tiempoUsado; }, 0),
+        porCompetencia: {}, porComponente: {}, wrongIds: aw
+      });
+      var main = document.getElementById('main-content');
+      if (main) main.innerHTML = this.renderSimulacroCompletoResultados();
+    }
+  },
+
+  _showSeccionTransicion() {
+    var sim = this.state.simulacro;
+    var nextSec = sim.secciones[sim.seccionActual];
+    var prevResult = sim.resultadosSecciones[sim.resultadosSecciones.length - 1];
+    var main = document.getElementById('main-content');
+    if (!main) return;
+    main.innerHTML = '<div class="simulacro-transicion">' +
+      '<div class="simulacro-transicion-check">✓</div>' +
+      '<div class="card-title">' + prevResult.nombre + ' completada</div>' +
+      '<div class="text-sm text-muted mt-2">' + prevResult.correctas + '/' + prevResult.total + ' (' + prevResult.porcentaje + '%)</div>' +
+      '<div class="simulacro-transicion-next mt-4"><div class="text-lg">' + nextSec.icon + '</div>' +
+      '<div class="card-title">Siguiente: ' + nextSec.nombre + '</div>' +
+      '<div class="text-sm text-muted">' + Math.floor(nextSec.tiempo / 60) + ' minutos</div></div>' +
+      '<div class="simulacro-transicion-countdown mt-4 text-lg" id="transicion-countdown">3</div></div>';
+    var count = 3;
+    var self = this;
+    var interval = setInterval(function() {
+      count--;
+      var el = document.getElementById('transicion-countdown');
+      if (el) el.textContent = count;
+      if (count <= 0) { clearInterval(interval); self._loadSeccionMultiArea(); }
+    }, 1000);
+  },
+
+  _loadSeccionMultiArea() {
+    var sim = this.state.simulacro;
+    var sec = sim.secciones[sim.seccionActual];
+    var preguntas = [];
+    if (typeof PREGUNTAS_ICFES !== 'undefined' && PREGUNTAS_ICFES[sec.area] && PREGUNTAS_ICFES[sec.area][sec.pruebaId]) {
+      preguntas = this._shuffle(PREGUNTAS_ICFES[sec.area][sec.pruebaId]);
+    }
+    sim.area = sec.area; sim.pruebaId = sec.pruebaId; sim.preguntas = preguntas;
+    sim.respuestas = {}; sim.actual = 0; sim.tiempoInicio = Date.now();
+    sim.tiempoLimite = sec.tiempo; sim.tiempoRestante = sec.tiempo; sim.finalizado = false;
+    this.render();
+  },
+
+  renderSimulacroCompletoResultados() {
+    var sim = this.state.simulacro;
+    if (!sim || !sim.resultadosSecciones) return '<div class="empty-state"><p class="empty-state-text">No hay resultados.</p></div>';
+    var resultados = sim.resultadosSecciones;
+    var tc = 0, tp = 0, tt = 0;
+    for (var r of resultados) { tc += r.correctas; tp += r.total; tt += r.tiempoUsado; }
+    var pctG = tp > 0 ? Math.round((tc / tp) * 100) : 0;
+    var gc = pctG >= 70 ? 'var(--success)' : pctG >= 50 ? 'var(--warning)' : 'var(--danger)';
+    var barras = '';
+    for (var r of resultados) {
+      var c = r.porcentaje >= 70 ? 'var(--success)' : r.porcentaje >= 50 ? 'var(--warning)' : 'var(--danger)';
+      barras += '<div class="multiarea-result-row"><span class="multiarea-result-icon">' + r.icon + '</span><span class="multiarea-result-nombre">' + r.nombre + '</span><div class="multiarea-result-bar-wrap"><div class="multiarea-result-bar" style="width:' + r.porcentaje + '%;background:' + c + '"></div></div><span class="multiarea-result-pct" style="color:' + c + '">' + r.porcentaje + '%</span><span class="text-xs text-muted">' + r.correctas + '/' + r.total + '</span></div>';
+    }
+    return '<div class="simulacro-resultados"><div class="flex items-center justify-between" style="flex-wrap:wrap;gap:var(--sp-3)"><div><h1 class="section-title">Saber 11 Completo — Resultados</h1><p class="text-sm text-secondary">' + resultados.length + ' areas · ' + Math.floor(tt / 60) + ' min</p></div><button class="btn btn-secondary" data-action="navigate" data-value="#/simulacro">Nuevo Simulacro</button></div>' +
+      '<div class="simulacro-score-panel card"><div class="card-body"><div class="simulacro-score-center"><div class="simulacro-score" style="color:' + gc + '">' + tc + '/' + tp + '</div><div class="simulacro-score-pct" style="color:' + gc + '">' + pctG + '% global</div></div></div></div>' +
+      '<div class="card mt-4"><div class="card-header"><span class="card-title">Resultados por Area</span></div><div class="card-body">' + barras + '</div></div>' +
+      '<div class="flex gap-2 mt-4"><button class="btn btn-primary" data-action="navigate" data-value="#/dashboard">Ver Estadisticas</button><button class="btn btn-secondary" data-action="navigate" data-value="#/simulacro">Volver</button></div></div>';
+  },
+
   // === TOAST ===
   showToast(msg) {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    const toast = document.createElement('div');
-    toast.className = 'toast';
+    let toast = document.getElementById('app-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'app-toast';
+      toast.className = 'toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      toast.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(toast);
+    }
     toast.textContent = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    toast.classList.remove('toast-hide');
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => toast.classList.add('toast-hide'), 3000);
   }
 };
 
 // === HELPERS ===
+const _highlightCache = new Map();
 function highlightText(text, query) {
   if (!query) return text;
   const words = query.split(/\s+/).filter(w => w.length > 1);
   let result = text;
   for (const word of words) {
-    const re = new RegExp(`(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    let re = _highlightCache.get(word);
+    if (!re) {
+      re = new RegExp(`(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      _highlightCache.set(word, re);
+      if (_highlightCache.size > 50) _highlightCache.delete(_highlightCache.keys().next().value);
+    }
     result = result.replace(re, '<mark>$1</mark>');
   }
   return result;

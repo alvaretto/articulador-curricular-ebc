@@ -3,6 +3,8 @@
 const STORAGE_PREFIX = 'articulador_ebc_';
 
 const Storage = {
+  _coberturaCache: new Map(),
+
   // Guardar/leer genérico
   set(key, value) {
     try {
@@ -135,6 +137,30 @@ const Storage = {
     return this.set('historial_ia', historial);
   },
 
+  // === HISTORIAL DE SIMULACROS ===
+  saveSimulacroResult(result) {
+    const historial = this.get('simulacro_historial', []);
+    result.id = 'sim_' + Date.now();
+    result.fecha = new Date().toISOString();
+    historial.unshift(result);
+    if (historial.length > 20) historial.length = 20;
+    return this.set('simulacro_historial', historial);
+  },
+
+  getSimulacroResults(area) {
+    const all = this.get('simulacro_historial', []);
+    return area ? all.filter(r => r.area === area) : all;
+  },
+
+  getUltimoResultado(area, pruebaId) {
+    const resultados = this.getSimulacroResults(area);
+    return resultados.find(r => r.pruebaId === pruebaId) || null;
+  },
+
+  limpiarHistorialSimulacros() {
+    this.remove('simulacro_historial');
+  },
+
   // === ESTADO DE NAVEGACIÓN ===
   getUltimaVista() {
     return this.get('ultima_vista', { area: 'matematicas', grupo: '8-9', eje: null });
@@ -169,6 +195,7 @@ const Storage = {
       if (key.startsWith(STORAGE_PREFIX)) keys.push(key);
     }
     keys.forEach(k => localStorage.removeItem(k));
+    this._coberturaCache.clear();
   },
 
   // === COBERTURA DE ESTÁNDARES ===
@@ -180,8 +207,12 @@ const Storage = {
 
   // Retorna Set de índices trabajados para un área+grupo
   getEstandaresTrabajados(area, grupo) {
-    const arr = this.get(this._coberturaKey(area, grupo), []);
-    return new Set(arr);
+    const key = this._coberturaKey(area, grupo);
+    if (this._coberturaCache.has(key)) return this._coberturaCache.get(key);
+    const arr = this.get(key, []);
+    const s = new Set(arr);
+    this._coberturaCache.set(key, s);
+    return s;
   },
 
   // Toggle: marca o desmarca un estándar por índice
@@ -221,6 +252,7 @@ const Storage = {
   // Reiniciar progreso de un área+grupo
   resetProgreso(area, grupo) {
     this.remove(this._coberturaKey(area, grupo));
+    this._coberturaCache.delete(this._coberturaKey(area, grupo));
   }
 };
 

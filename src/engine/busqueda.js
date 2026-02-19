@@ -1,10 +1,14 @@
 // busqueda.js — Búsqueda full-text en estándares EBC, DBA y planes
 
+const _normCache = new Map();
 function normalizarTexto(texto) {
-  return texto.toLowerCase()
+  if (_normCache.has(texto)) return _normCache.get(texto);
+  const result = texto.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quitar tildes
     .replace(/[^\w\s]/g, ' ') // quitar puntuación
     .replace(/\s+/g, ' ').trim();
+  if (_normCache.size < 2000) _normCache.set(texto, result);
+  return result;
 }
 
 function buscarEstandares(query, filtroArea) {
